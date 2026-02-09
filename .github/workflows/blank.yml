@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Área do Cliente - Vô Máquinas</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:#0b141a; color:#e9edef;}
+    header{padding:16px; background:#202c33; position:sticky; top:0; border-bottom:1px solid rgba(255,255,255,.08)}
+    .wrap{padding:16px; max-width:1000px; margin:0 auto;}
+    .card{background:#202c33; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; margin:12px 0;}
+    input,select{width:100%; padding:12px; border-radius:12px; border:none; background:#2a3942; color:#fff; font-size:16px;}
+    button{padding:12px 14px; border-radius:12px; border:none; cursor:pointer; font-weight:800;}
+    .btn{background:#25D366; color:#0b141a;}
+    .btn2{background:#3b4a54; color:#e9edef;}
+    table{width:100%; border-collapse:collapse; margin-top:8px;}
+    td,th{border-bottom:1px solid rgba(255,255,255,.08); padding:8px; text-align:left; font-size:14px;}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    @media(max-width:700px){.row{grid-template-columns:1fr}}
+    .muted{opacity:.75}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="font-weight:900">Vô Máquinas • Área do Cliente</div>
+    <div class="muted" id="sub">Carregando…</div>
+  </header>
+
+  <div class="wrap">
+    <div class="card" id="loginCard">
+      <div style="font-weight:900; margin-bottom:8px">Acesso</div>
+      <div class="row">
+        <div>
+          <label class="muted">CPF</label>
+          <input id="cpf" placeholder="Somente números">
+        </div>
+        <div>
+          <label class="muted">Token</label>
+          <input id="token" placeholder="Código do acesso">
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button class="btn" id="btnEntrar">Entrar</button>
+        <button class="btn2" id="btnCarregarUrl">Puxar do link</button>
+      </div>
+      <div class="muted" style="margin-top:10px">Dica: se você veio do cadastro, já abre preenchido.</div>
+    </div>
+
+    <div class="card" id="clienteCard" style="display:none;">
+      <div style="font-weight:900">Seus dados</div>
+      <div id="clienteInfo" class="muted" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card" id="catalogCard" style="display:none;">
+      <div style="font-weight:900">Catálogo (locação)</div>
+      <div class="muted">Selecione as máquinas e quantidades.</div>
+      <div id="catalog"></div>
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button class="btn" id="btnOferta">Ver Planos + Frete</button>
+        <button class="btn2" id="btnLimpar">Limpar carrinho</button>
+      </div>
+    </div>
+
+    <div class="card" id="ofertaCard" style="display:none;">
+      <div style="font-weight:900">Planos + Frete</div>
+      <div id="ofertaInfo" class="muted" style="margin-top:8px"></div>
+      <div style="margin-top:10px">
+        <label class="muted">Escolha o Plano</label>
+        <select id="planoSel"></select>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button class="btn" id="btnCriarPedido">Enviar Pedido</button>
+        <button class="btn2" id="btnVoltar">Voltar</button>
+      </div>
+      <div class="muted" style="margin-top:10px">Pagamento não é obrigatório para enviar o pedido.</div>
+    </div>
+
+    <div class="card" id="pedidoCard" style="display:none;">
+      <div style="font-weight:900">Pedido criado ✅</div>
+      <div id="pedidoInfo" class="muted" style="margin-top:8px"></div>
+      <button class="btn2" onclick="location.reload()" style="margin-top:12px">Novo pedido</button>
+    </div>
+  </div>
+
+<script>
+  const qs = new URLSearchParams(location.search);
+  const el = id => document.getElementById(id);
+  const state = { catalog: [], cart: {}, precos: [], oferta: null };
+
+  function getCartArray(){
+    return Object.keys(state.cart).map(id => ({ Maquina_ID:id, qty: Number(state.cart[id]||0) })).filter(x=>x.qty>0);
+  }
+
+  function renderCatalog(){
+    const box = el("catalog");
+    box.innerHTML = "";
+    const rows = state.catalog.slice(0,60); // leve
+    const table = document.createElement("table");
+    table.innerHTML = `<thead><tr><th>Máquina</th><th>Tipo</th><th>Marca</th><th>Qtd</th></tr></thead>`;
+    const tb = document.createElement("tbody");
+    rows.forEach(m=>{
+      const tr = document.createElement("tr");
+      const id = m.Maquina_ID;
+      tr.innerHTML = `
+        <td><b>${m.Nome_Exibicao||""}</b><div class="muted">${id}</div></td>
+        <td>${m.Tipo||""}</td>
+        <td>${m.Marca||""} ${m.Modelo||""}</td>
+        <td style="width:90px">
+          <input data-id="${id}" type="number" min="0" value="${state.cart[id]||0}" style="padding:10px;border-radius:10px">
+        </td>
+      `;
+      tb.appendChild(tr);
+    });
+    table.appendChild(tb);
+    box.appendChild(table);
+
+    box.querySelectorAll("input[data-id]").forEach(inp=>{
+      inp.addEventListener("input", ()=>{
+        const id = inp.getAttribute("data-id");
+        const v = Math.max(0, Number(inp.value||0));
+        state.cart[id] = v;
+      });
+    });
+  }
+
+  function setSub(txt){ el("sub").textContent = txt; }
+
+  function bootstrap(){
+    const cpf = el("cpf").value.trim();
+    const token = el("token").value.trim();
+    setSub("Validando…");
+    google.script.run.withSuccessHandler(res=>{
+      if(!res || !res.ok){ setSub(res?.error || "Falha"); alert(res?.error || "Falha"); return; }
+
+      el("loginCard").style.display = "none";
+      el("clienteCard").style.display = "";
+      el("catalogCard").style.display = "";
+
+      const c = res.cliente || {};
+      const km = res.distKm;
+      el("clienteInfo").innerHTML = `
+        <div><b>${c.Nome_Completo||""}</b></div>
+        <div>CPF: ${c.Cliente_ID||""}</div>
+        <div>Classe: ${c.Classe_Cliente||3}</div>
+        <div>Distância: ${km==null ? "não disponível" : (km+" km")}</div>
+      `;
+
+      state.catalog = res.catalog || [];
+      renderCatalog();
+      setSub("Conectado ✅");
+    }).portalBootstrap(cpf, token);
+  }
+
+  function oferta(){
+    const cpf = el("cpf").value.trim();
+    const token = el("token").value.trim();
+    const itens = getCartArray();
+    if(!itens.length) return alert("Selecione pelo menos 1 máquina.");
+
+    setSub("Calculando oferta…");
+    google.script.run.withSuccessHandler(res=>{
+      if(!res || !res.ok){ setSub(res?.error || "Falha"); alert(res?.error || "Falha"); return; }
+
+      state.oferta = res;
+      el("catalogCard").style.display = "none";
+      el("ofertaCard").style.display = "";
+
+      const f = res.frete || {};
+      el("ofertaInfo").innerHTML = `
+        <div>Classe do cliente: <b>${res.classe}</b></div>
+        <div>Distância: <b>${res.distKm==null ? "não disponível" : (res.distKm+" km")}</b></div>
+        <div>Frete estimado: <b>R$ ${Number(f.valor||0).toFixed(2)}</b> (fator ${f.fator||1})</div>
+      `;
+
+      // Planos (aqui é simples: lista os Plano_ID que aparecem nos preços)
+      const planoSel = el("planoSel");
+      planoSel.innerHTML = "";
+      const planosUniq = [...new Set((res.precos||[]).map(x=>x.Plano_ID).filter(Boolean))];
+      planosUniq.forEach(pid=>{
+        const opt = document.createElement("option");
+        opt.value = pid;
+        opt.textContent = pid;
+        planoSel.appendChild(opt);
+      });
+      if(!planosUniq.length){
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Sem planos disponíveis (ajuste regras/preços)";
+        planoSel.appendChild(opt);
+      }
+
+      setSub("Oferta pronta ✅");
+    }).portalGetOferta(cpf, token, itens);
+  }
+
+  function criarPedido(){
+    const cpf = el("cpf").value.trim();
+    const token = el("token").value.trim();
+    const itens = getCartArray();
+    const planoId = el("planoSel").value || "";
+
+    setSub("Criando pedido…");
+    google.script.run.withSuccessHandler(res=>{
+      if(!res || !res.ok){ setSub(res?.error || "Falha"); alert(res?.error || "Falha"); return; }
+
+      el("ofertaCard").style.display = "none";
+      el("pedidoCard").style.display = "";
+
+      el("pedidoInfo").innerHTML = `
+        <div>Pedido: <b>${res.pedidoId}</b></div>
+        <div>Status: <b>${res.status}</b></div>
+        <div>Frete: <b>R$ ${Number(res.frete?.valor||0).toFixed(2)}</b></div>
+      `;
+      setSub("Pedido criado ✅");
+    }).portalCriarPedido(cpf, token, itens, planoId);
+  }
+
+  el("btnEntrar").addEventListener("click", bootstrap);
+  el("btnOferta").addEventListener("click", oferta);
+  el("btnCriarPedido").addEventListener("click", criarPedido);
+
+  el("btnLimpar").addEventListener("click", ()=>{
+    state.cart = {};
+    renderCatalog();
+  });
+  el("btnVoltar").addEventListener("click", ()=>{
+    el("ofertaCard").style.display = "none";
+    el("catalogCard").style.display = "";
+  });
+
+  el("btnCarregarUrl").addEventListener("click", ()=>{
+    el("cpf").value = (qs.get("cpf")||"").replace(/\D/g,"");
+    el("token").value = qs.get("token")||"";
+  });
+
+  // auto-fill do link
+  if(qs.get("cpf") && qs.get("token")){
+    el("cpf").value = (qs.get("cpf")||"").replace(/\D/g,"");
+    el("token").value = qs.get("token")||"";
+    bootstrap();
+  } else {
+    setSub("Informe CPF + Token");
+  }
+</script>
+</body>
+</html>
