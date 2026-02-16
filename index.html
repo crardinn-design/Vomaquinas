@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Vô Máquinas - Cadastro</title>
+
+  <style>
+    :root{
+      --bg:#0b141a;
+      --panel:#202c33;
+      --panel2:#1a252b;
+      --text:#e9edef;
+      --muted:rgba(233,237,239,.72);
+      --green:#25D366;
+      --green2:#1dd75f;
+      --me:#005c4b;
+      --stroke:rgba(255,255,255,0.10);
+      --danger:#ff5a5f;
+      --warn:#ffcc00;
+
+      --app-top: 0px;
+      --app-height: 100vh;
+      --header-h: 64px;
+      --input-h: 70px;
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      overflow:hidden;
+    }
+
+    body{
+      background-image:url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+      background-size:420px;
+    }
+
+    .app{
+      position: fixed;
+      left: 0; right: 0;
+      top: 0;
+      height: var(--app-height);
+      background: rgba(11,20,26,.92);
+      overflow: hidden;
+    }
+
+    .header{
+      position:absolute;
+      top:0; left:0; right:0;
+      background:linear-gradient(180deg, rgba(32,44,51,.98), rgba(26,37,43,.92));
+      padding: calc(10px + env(safe-area-inset-top)) 14px 10px 14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      border-bottom:1px solid var(--stroke);
+      z-index: 9;
+      backdrop-filter: blur(6px);
+    }
+
+    .avatar{
+      width:42px;height:42px;border-radius:50%;
+      background:var(--me);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;
+      flex:0 0 auto;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 6px 16px rgba(0,0,0,.25);
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .head-col{ flex:1; min-width:0; }
+    .title{
+      font-weight:900;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.1;
+    }
+    .subtitle{
+      font-size:11px;
+      color:var(--green);
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:2px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:3px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.12);
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:900;
+    }
+    .dot{
+      width:7px;height:7px;border-radius:999px;
+      background:var(--green2);
+      box-shadow:0 0 18px rgba(37,211,102,.55);
+    }
+
+    .progressWrap{
+      width:100%;
+      margin-top:6px;
+      height:6px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .progressBar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--green), var(--green2));
+      box-shadow:0 0 16px rgba(37,211,102,.35);
+      transition:width .25s ease;
+    }
+
+    .headActions{
+      display:flex; gap:8px;
+      flex:0 0 auto;
+      align-items:center;
+    }
+    .iconBtn{
+      width:38px;height:38px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.12);
+      color:#fff;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:.92;
+      touch-action: manipulation;
+    }
+    .iconBtn:active{ transform:scale(.98); }
+
+    .chat{
+      position:absolute;
+      top: var(--header-h);
+      left:0; right:0;
+      bottom: var(--input-h);
+      overflow-y:auto;
+      -webkit-overflow-scrolling: touch;
+      padding:14px 14px 18px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .msg{display:flex;width:100%;}
+    .msg.me{justify-content:flex-end;}
+
+    .bubble{
+      max-width:88%;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.28;
+      box-shadow:0 1px 1px rgba(0,0,0,.2);
+      word-break: break-word;
+      border:1px solid rgba(255,255,255,.07);
+    }
+    .bot-b{background:rgba(32,44,51,.96);border-top-left-radius:4px;}
+    .me-b{background:rgba(0,92,75,.95);border-top-right-radius:4px;}
+
+    .time{
+      font-size:10px;
+      opacity:.55;
+      text-align:right;
+      margin-top:6px;
+      letter-spacing:.2px;
+    }
+
+    .typing{
+      display:inline-flex;
+      gap:4px;
+      margin-top:6px;
+      opacity:.75;
+    }
+    .typing span{
+      width:6px;height:6px;border-radius:999px;
+      background:rgba(255,255,255,.55);
+      display:inline-block;
+      animation:blink 1.15s infinite;
+    }
+    .typing span:nth-child(2){ animation-delay:.15s; }
+    .typing span:nth-child(3){ animation-delay:.30s; }
+    @keyframes blink{
+      0%, 60%, 100%{ transform:translateY(0); opacity:.45; }
+      30%{ transform:translateY(-2px); opacity:1; }
+    }
+
+    .input-bar{
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      background:linear-gradient(180deg, rgba(32,44,51,.96), rgba(26,37,43,.96));
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      border-top:1px solid var(--stroke);
+      z-index: 10;
+      backdrop-filter: blur(6px);
+    }
+
+    input{
+      flex:1;
+      background:#2a3942;
+      border:none;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:26px;
+      outline:none;
+      font-size:16px;
+      min-width:0;
+    }
+    input::placeholder{ color:rgba(233,237,239,.58); }
+
+    .send-btn{
+      background:linear-gradient(180deg, var(--green2), var(--green));
+      border:none;
+      width:44px;height:44px;border-radius:50%;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      flex: 0 0 auto;
+      box-shadow:0 10px 22px rgba(37,211,102,.22);
+      touch-action: manipulation;
+    }
+    .send-btn:active{ transform:scale(.98); }
+    .send-btn[disabled]{ opacity:.5; filter:grayscale(1); cursor:not-allowed; }
+
+    .btn{
+      background:#3b4a54;
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:18px;
+      cursor:pointer;
+      margin-top:10px;
+      margin-right:6px;
+      font-weight:900;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      touch-action: manipulation;
+      -webkit-user-select:none;
+      user-select:none;
+    }
+    .btn.full{width:100%;margin-right:0;}
+    .btn.ok{
+      background:linear-gradient(180deg, var(--green2), var(--green));
+      color:#06110c;
+      border:none;
+    }
+    .btn.danger{
+      background:rgba(255,90,95,.15);
+      border:1px solid rgba(255,90,95,.45);
+      color:#fff;
+    }
+    .btn.ghost{
+      background:transparent;
+      border:1px solid rgba(255,255,255,.12);
+      color:rgba(255,255,255,.88);
+    }
+    .btn[disabled]{
+      opacity:.45;
+      filter:grayscale(1);
+      cursor:not-allowed;
+      pointer-events:none;
+    }
+
+    .mini{font-size:12px;opacity:.78;margin-top:8px}
+
+    .file-btn{
+      background:#2a3942;
+      padding:13px;
+      border-radius:12px;
+      margin-top:10px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:900;
+      touch-action: manipulation;
+      -webkit-user-select:none;
+      user-select:none;
+    }
+
+    .pick{
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(0,0,0,.12);
+    }
+    .pick-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:9px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .pick-row:last-child{border-bottom:none;}
+    .pick-name{font-weight:900;}
+    .qty{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex:0 0 auto;
+    }
+    .qbtn{
+      width:34px;height:34px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:#2a3942;
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+      touch-action: manipulation;
+      -webkit-user-select:none;
+      user-select:none;
+    }
+    .qval{
+      min-width:22px;
+      text-align:center;
+      font-weight:900;
+    }
+    .otherBox{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .otherBox input{
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:14px;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.92);
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      pointer-events:auto;
+    }
+    .modal{
+      position:relative;
+      background:linear-gradient(180deg, rgba(32,44,51,.98), rgba(26,37,43,.94));
+      padding:22px;
+      border-radius:22px;
+      text-align:center;
+      width:100%;
+      max-width:380px;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 18px 48px rgba(0,0,0,.45);
+    }
+    .modal h3{ margin:0 0 8px 0; }
+    .modal p{ margin:0 0 14px 0; opacity:.9; }
+    .modalClose{
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:32px;height:32px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.22);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+      display:none;
+    }
+
+    .brandRow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .brandLogo{
+      width:44px;height:44px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      background:rgba(0,92,75,.35);
+      box-shadow:0 10px 22px rgba(0,0,0,.25);
+      flex:0 0 auto;
+    }
+    .brandLogo img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .spinner{
+      width:30px;height:30px;
+      border:3px solid rgba(255,255,255,.12);
+      border-left-color:var(--green);
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      margin:12px auto;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .hr{
+      height:1px;
+      background:rgba(255,255,255,.08);
+      margin:10px 0;
+    }
+
+    .consentBox{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.16);
+      text-align:left;
+    }
+
+    .consentLabel{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .consentLabel input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .cbox{
+      width:18px;height:18px;
+      border-radius:5px;
+      border:1px solid rgba(255,255,255,.28);
+      background:rgba(0,0,0,.18);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+      flex:0 0 auto;
+      margin-top:2px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .cbox svg{
+      width:14px;height:14px;
+      opacity:0;
+      transform:scale(.9);
+      transition:opacity .12s ease, transform .12s ease;
+      fill: #06110c;
+    }
+
+    .consentLabel.checked .cbox{
+      background:linear-gradient(180deg, var(--green2), var(--green));
+      border-color: rgba(0,0,0,.0);
+      box-shadow:0 10px 22px rgba(37,211,102,.18);
+    }
+    .consentLabel.checked .cbox svg{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    .consentText{
+      font-size:12px;
+      line-height:1.25;
+      color:rgba(233,237,239,.88);
+      font-weight:700;
+    }
+    .consentText a{
+      color:rgba(233,237,239,.86);
+      font-weight:900;
+      text-decoration:none;
+      border-bottom:1px dotted rgba(233,237,239,.28);
+    }
+    .consentText a:hover{
+      color:var(--green2);
+      border-bottom-color: rgba(29,215,95,.55);
+    }
+    .consentWarn{
+      font-size:12px;
+      color:rgba(255,204,0,.95);
+      font-weight:900;
+      margin-top:8px;
+      display:none;
+    }
+
+    .lockedInput{
+      opacity:.55;
+      filter:grayscale(1);
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app">
+    <div class="header" id="header">
+      <div class="avatar" aria-label="Vô Máquinas">
+        <img id="logoTop"
+             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFt0p6z1TfdNuhMDmTpJloEzyZ4zGNg6XpoA&s"
+             onerror="this.style.display='none'; this.parentNode.textContent='VM';" />
+      </div>
+
+      <div class="head-col">
+        <div class="title">Vô Máquinas</div>
+        <div class="subtitle">
+          <span class="pill"><span class="dot"></span><span id="stepLabel">Assistente de Cadastro</span></span>
+          <span class="pill" id="resumePill" style="display:none;">Retomado</span>
+        </div>
+        <div class="progressWrap" aria-label="Progresso">
+          <div class="progressBar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="headActions">
+        <button class="iconBtn" id="btnHelp" title="Ajuda">?</button>
+        <button class="iconBtn" id="btnReset" title="Reiniciar">↻</button>
+      </div>
+    </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="input-bar" id="inputBar">
+      <input type="text" id="userInput" placeholder="Escreva uma mensagem..." inputmode="text" autocomplete="off" />
+      <button type="button" class="send-btn" id="sendBtn" aria-label="Enviar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#06110c">
+          <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOverlay" style="display:flex;">
+    <div class="modal">
+      <div class="brandRow">
+        <div class="brandLogo">
+          <img id="logoStart"
+               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFt0p6z1TfdNuhMDmTpJloEzyZ4zGNg6XpoA&s"
+               onerror="this.style.display='none';" />
+        </div>
+        <div style="text-align:left">
+          <div style="font-weight:900; font-size:16px; line-height:1.15;">Cadastro Vô Máquinas</div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700;">rápido • seguro • sem enrolação</div>
+        </div>
+      </div>
+
+      <h3>Vamos começar 😃</h3>
+      <p style="margin-bottom:10px;">Em poucos passos, seu cadastro fica pronto.</p>
+
+      <div class="consentBox">
+        <label class="consentLabel" id="consentLabel" for="policyChk">
+          <input type="checkbox" id="policyChk" />
+          <span class="cbox" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9.0 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"></path>
+            </svg>
+          </span>
+          <span class="consentText">
+            Eu li e aceito a
+            <a href="https://www.vomaquinas.com.br/pol%C3%ADtica-de-privacidade" target="_blank" rel="noopener">
+              Política de Privacidade
+            </a>.
+            <div style="opacity:.82; margin-top:6px;">
+              (Se você não aceitar, não conseguimos continuar.)
+            </div>
+          </span>
+        </label>
+
+        <div class="consentWarn" id="consentWarn">⚠️ Marque o aceite para liberar o botão INICIAR.</div>
+      </div>
+
+      <button class="btn ok full" id="startBtn" style="padding:14px;font-weight:900;" disabled>
+        INICIAR
+      </button>
+
+      <button class="btn ghost full" id="closeOverlayBtn">
+        Fechar
+      </button>
+
+      <div class="mini" style="margin-top:10px;">
+        Seus dados serão usados apenas para análise e atendimento da Vô Máquinas.
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="loadingOverlay" style="display:none;">
+    <div class="modal">
+      <button type="button" class="modalClose" id="loadCloseBtn" aria-label="Fechar">✕</button>
+      <div class="spinner"></div>
+      <p id="loadMsg" style="margin:0;">Processando...</p>
+      <div class="mini" id="loadMini" style="margin-top:8px; display:none;"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="googleOverlay" style="display:none;">
+    <div class="modal" style="max-width:420px;">
+      <h3>Entrar com conta Google</h3>
+      <p style="margin-bottom:8px;">Para facilitar, escolha sua conta para preencher o e-mail automaticamente.</p>
+      <div id="googleBtnWrap" style="display:flex;justify-content:center; margin-top:10px;"></div>
+      <div class="mini" id="googleMini" style="margin-top:10px;">Se não aparecer, toque em "Tentar novamente".</div>
+      <button class="btn ghost full" id="googleRetryBtn" type="button">Tentar novamente</button>
+      <button class="btn ok full" id="googleSkipBtn" type="button">Continuar sem conta Google</button>
+    </div>
+  </div>
+
+<script>
+/* Arquivo integrado: mesmo index do cliente + recuperação de erro com backup HTML/PDF + WhatsApp */
+const CONFIG = {
+  STORAGE_KEY: "VM_CADASTRO_STATE_V2",
+  LOGO_URL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFt0p6z1TfdNuhMDmTpJloEzyZ4zGNg6XpoA&s",
+  MAX_QTY_MACHINE: 9,
+  REQUIRE_EMAIL: true,
+  ACCEPT_CNPJ: true,
+  FILE_ACCEPT: "image/*,application/pdf",
+  FILE_MAX_MB: 8,
+  REQUIRE_PRIVACY_ACCEPT: true,
+  PRIVACY_URL: "https://www.vomaquinas.com.br/pol%C3%ADtica-de-privacidade",
+  ENABLE_AUTO_EMAIL_CAPTURE: true,
+  ENABLE_GOOGLE_ONE_TAP: false,
+  GOOGLE_CLIENT_ID: "465648231886-qoo5b3b7j3bhn0fde8289euimdluu1nc.apps.googleusercontent.com",
+  COMPANY_WA: "556294091954"
+};
+
+const headerEl = document.getElementById("header");
+const inputBarEl = document.getElementById("inputBar");
+const chat = document.getElementById("chat");
+const input = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+
+function keepInputFocus(){
+  try { input.focus({ preventScroll: true }); } catch(e){ try{ input.focus(); }catch(_e){} }
+}
+["pointerdown","touchstart","mousedown"].forEach(evt=>{
+  sendBtn.addEventListener(evt, (e)=>{ try { e.preventDefault(); } catch(err){} keepInputFocus(); }, { passive:false });
+});
+["pointerdown","touchstart","mousedown"].forEach(evt=>{
+  chat.addEventListener(evt, (e)=>{
+    const hit = e.target.closest("[data-act],button,a,input,select,textarea,label");
+    if(!hit) return;
+    setTimeout(()=> keepInputFocus(), 0);
+  }, { passive:true });
+});
+
+const startOverlay = document.getElementById("startOverlay");
+const startBtn = document.getElementById("startBtn");
+const closeOverlayBtn = document.getElementById("closeOverlayBtn");
+const policyChk = document.getElementById("policyChk");
+const consentWarn = document.getElementById("consentWarn");
+const consentLabel = document.getElementById("consentLabel");
+const resumePill = document.getElementById("resumePill");
+const stepLabelEl = document.getElementById("stepLabel");
+const progressBarEl = document.getElementById("progressBar");
+const googleOverlay = document.getElementById("googleOverlay");
+const googleBtnWrap = document.getElementById("googleBtnWrap");
+const googleRetryBtn = document.getElementById("googleRetryBtn");
+const googleSkipBtn = document.getElementById("googleSkipBtn");
+const googleMini = document.getElementById("googleMini");
+
+const runtime = {
+  autoEmail: "",
+  fileRetry: { stepKey:"", inputId:"" },
+  pendingBackup: null,
+  autoEmailPromptShown: false,
+  autoEmailState: "idle",
+  autoEmailAttempts: 0,
+  oneTapLoaded: false,
+  oneTapClientId: "",
+  oneTapTried: false,
+  googleOverlayShown: false
+};
+const loadingState = { onClose:null };
+const cepLookupState = { id:0, canceled:false };
+
+function setVar(name, val){ document.documentElement.style.setProperty(name, val); }
+function syncAppToViewport(){
+  const vv = window.visualViewport;
+  const h = vv ? vv.height : window.innerHeight;
+  setVar("--app-top", `0px`);
+  setVar("--app-height", `${h}px`);
+  requestAnimationFrame(()=>{
+    const hh = headerEl ? headerEl.getBoundingClientRect().height : 64;
+    const ih = inputBarEl ? inputBarEl.getBoundingClientRect().height : 70;
+    setVar("--header-h", `${Math.ceil(hh)}px`);
+    setVar("--input-h", `${Math.ceil(ih)}px`);
+  });
+}
+window.addEventListener("resize", syncAppToViewport);
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", syncAppToViewport);
+  window.visualViewport.addEventListener("scroll", syncAppToViewport);
+}
+syncAppToViewport();
+
+function scrollToBottom(){ chat.scrollTop = chat.scrollHeight; }
+input.addEventListener("focus", ()=>{ setTimeout(()=>{ syncAppToViewport(); scrollToBottom(); }, 60); });
+input.addEventListener("blur", ()=>{ setTimeout(syncAppToViewport, 60); });
+
+function bindTap(el, handler){
+  if(!el) return;
+  let last = 0;
+  const wrap = (ev)=>{
+    const now = Date.now();
+    if(now - last < 350) return;
+    last = now;
+    if(ev.type !== "click"){
+      try{ ev.preventDefault(); }catch(e){}
+    }
+    handler(ev);
+    requestAnimationFrame(()=> keepInputFocus());
+    setTimeout(()=> keepInputFocus(), 30);
+  };
+  el.addEventListener("click", wrap);
+  el.addEventListener("touchend", wrap, {passive:false});
+  el.addEventListener("pointerup", wrap);
+}
+
+const state = {
+  started: false,
+  step: "NOME",
+  privacyAccepted: false,
+  edit: { active:false, key:"" },
+  data: {
+    nome:"", cpf:"", tel:"", email:"",
+    quer:"Alugar",
+    maquinas:{ Reta:0, "Ponto Cadeia":0, Galoneira:0, Interlock:0 },
+    outros:"",
+    moradia_tipo:"",
+    moradia_tempo:"",
+    tem_contrato_locacao:"",
+    moradia_acordo:"",
+    data_nasc:"", rg:"", nacionalidade:"", profissao:"", estado_civil:"",
+    ref1_nome:"", ref1_tel:"",
+    ref2_nome:"", ref2_tel:"",
+    ref3_nome:"", ref3_tel:"",
+    avalista_nome:"", avalista_tel:"",
+    temAvalista:false,
+    cep:"", logradouro:"", bairro:"", cidade:"", uf:"",
+    numero:"", complemento:"", endereco:"",
+    entregaMesmo:true,
+    entrega_endereco:"",
+    lat:"", lng:"",
+    referencia:"", obs:"",
+    files:{}
+  }
+};
+
+const INITIAL_STATE = JSON.parse(JSON.stringify(state));
+
+function resetAppWithoutReload(){
+  clearState();
+
+  const fresh = JSON.parse(JSON.stringify(INITIAL_STATE));
+  state.started = fresh.started;
+  state.step = fresh.step;
+  state.privacyAccepted = fresh.privacyAccepted;
+  state.edit = fresh.edit;
+  state.data = fresh.data;
+
+  runtime.pendingBackup = null;
+  runtime.autoEmailPromptShown = false;
+
+  chat.innerHTML = "";
+  policyChk.checked = false;
+  refreshConsentUI();
+
+  setHint();
+  startOverlay.style.display = "flex";
+  lockChat(true);
+
+  addMsg("bot", "Cadastro reiniciado com sucesso. ✅");
+}
+
+function saveState(){ try{ localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadState(){
+  try{
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if(!raw) return false;
+    const obj = JSON.parse(raw);
+    if(!obj || typeof obj !== "object") return false;
+    if(typeof obj.started === "boolean") state.started = obj.started;
+    if(typeof obj.step === "string") state.step = obj.step;
+    if(typeof obj.privacyAccepted === "boolean") state.privacyAccepted = obj.privacyAccepted;
+    if(obj.edit) state.edit = obj.edit;
+    if(obj.data && typeof obj.data === "object"){
+      Object.assign(state.data, obj.data);
+      state.data.maquinas = Object.assign({ Reta:0, "Ponto Cadeia":0, Galoneira:0, Interlock:0 }, obj.data.maquinas || {});
+      state.data.files = obj.data.files || {};
+    }
+    return true;
+  }catch(e){ return false; }
+}
+function clearState(){ try{ localStorage.removeItem(CONFIG.STORAGE_KEY); }catch(e){} }
+
+function onlyDigits(v){ return String(v||"").replace(/\D/g,""); }
+function firstName(full){ return String(full||"").trim().split(/\s+/)[0] || ""; }
+function isNo(v){ v=String(v||"").toLowerCase().trim(); return v==="não"||v==="nao"||v==="n"||v==="0"; }
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+function formatRich(text){ let t = esc(text); t = t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); t = t.replace(/\n/g, "<br>"); return t; }
+function isValidEmail(s){ s = String(s||"").trim(); return !!s && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+function isDateBR(s){ s = String(s||"").trim(); if(!/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return false; const [dd,mm,yyyy] = s.split("/").map(n=>parseInt(n,10)); return !(yyyy < 1900 || yyyy > 2100 || mm < 1 || mm > 12 || dd < 1 || dd > 31); }
+function nowHM(){ return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
+function randDelay(min=700, max=1300){ return Math.floor(min + Math.random() * (max - min)); }
+
+function detectAutoEmail(){
+  if(!CONFIG.ENABLE_AUTO_EMAIL_CAPTURE) return;
+  const fallback = String(localStorage.getItem("VM_AUTO_EMAIL") || "").trim();
+  if(isValidEmail(fallback)){ runtime.autoEmail = fallback; runtime.autoEmailState = "ready"; }
+  else { runtime.autoEmail = ""; runtime.autoEmailState = "unavailable"; }
+}
+
+function maybeOfferAutoEmail(){
+  if(state.step !== "EMAIL" || runtime.autoEmailPromptShown) return;
+  runtime.autoEmailPromptShown = true;
+  detectAutoEmail();
+  const hasSaved = isValidEmail(runtime.autoEmail);
+  const btnSaved = hasSaved ? `<button class="btn ghost" type="button" data-act="HANDLE" data-val="AUTO_EMAIL_USE">✨ Usar meu e-mail salvo (${esc(runtime.autoEmail)})</button>` : "";
+  addMsg("bot","Se quiser, posso preencher seu e-mail automaticamente:", `<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;"><button class="btn ghost" type="button" data-act="HANDLE" data-val="AUTO_EMAIL_FETCH">✨ Usar meu e-mail do Google</button>${btnSaved}</div><div class="mini" style="margin-top:8px;">Se preferir, você pode digitar seu e-mail normalmente aqui no chat.</div>`);
+}
+
+function fetchEmailFromSession(){
+  return new Promise((resolve)=>{
+    if(!(window.google && google.script && google.script.run)){ resolve(""); return; }
+    google.script.run.withSuccessHandler((res)=> resolve(String(res && res.email ? res.email : "").trim())).withFailureHandler(()=> resolve("")).api_getLoggedEmail();
+  });
+}
+
+async function resolveGoogleClientId(){
+  if(runtime.oneTapClientId) return runtime.oneTapClientId;
+  const local = String(CONFIG.GOOGLE_CLIENT_ID || "").trim();
+  if(local){ runtime.oneTapClientId = local; return local; }
+  if(window.google && google.script && google.script.run && typeof google.script.run.withSuccessHandler === "function"){
+    return await new Promise((resolve)=>{
+      google.script.run.withSuccessHandler((res)=>{ const id = String((res && (res.clientId || (res.config && res.config.clientId))) || "").trim(); runtime.oneTapClientId = id; resolve(id); }).withFailureHandler(()=> resolve("")).api_getGoogleAuthConfig();
+    });
+  }
+  return "";
+}
+
+function loadGoogleIdentityLibrary(){
+  if(runtime.oneTapLoaded) return Promise.resolve(true);
+  if(document.querySelector('script[data-google-gsi="1"]')) return Promise.resolve(true);
+  return new Promise((resolve)=>{
+    const sc = document.createElement("script");
+    sc.src = "https://accounts.google.com/gsi/client";
+    sc.async = true; sc.defer = true; sc.dataset.googleGsi = "1";
+    sc.onload = ()=>{ runtime.oneTapLoaded = true; resolve(true); };
+    sc.onerror = ()=> resolve(false);
+    document.head.appendChild(sc);
+  });
+}
+
+function applyGoogleProfile(profile){
+  if(!profile || typeof profile !== "object") return;
+  const email = String(profile.email || "").trim();
+  if(isValidEmail(email)){
+    runtime.autoEmail = email;
+    try{ localStorage.setItem("VM_AUTO_EMAIL", email); }catch(e){}
+    if(state.step === "EMAIL") maybeOfferAutoEmail();
+  }
+  if(!state.data.nome){ const nm = String(profile.name || "").trim(); if(nm) state.data.nome = nm; }
+  saveState();
+}
+
+async function handleGoogleCredentialResponse(response){
+  const token = String((response && response.credential) || "").trim();
+  if(!token) return;
+  if(window.google && google.script && google.script.run && typeof google.script.run.withSuccessHandler === "function"){
+    google.script.run.withSuccessHandler((res)=>{ if(res && res.ok && res.profile) applyGoogleProfile(res.profile); if(googleOverlay) googleOverlay.style.display = "none"; if(!state.started) startFlow(); }).withFailureHandler(()=>{ if(googleOverlay) googleOverlay.style.display = "none"; if(!state.started) startFlow(); }).api_verifyGoogleIdToken(token);
+    return;
+  }
+  try{
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    applyGoogleProfile(payload || {});
+    if(googleOverlay) googleOverlay.style.display = "none";
+    if(!state.started) startFlow();
+  }catch(e){}
+}
+
+async function initializeGoogleAccounts(){
+  const clientId = await resolveGoogleClientId();
+  if(!clientId) return false;
+  const loaded = await loadGoogleIdentityLibrary();
+  if(!loaded || !window.google || !google.accounts || !google.accounts.id) return false;
+  try{
+    google.accounts.id.initialize({ client_id: clientId, callback: handleGoogleCredentialResponse, auto_select: false, cancel_on_tap_outside: true, use_fedcm_for_prompt: true });
+    return true;
+  }catch(e){ return false; }
+}
+
+async function renderGoogleButton(){
+  if(!googleBtnWrap) return false;
+  googleBtnWrap.innerHTML = "";
+  const ok = await initializeGoogleAccounts();
+  if(!ok) return false;
+  try{ google.accounts.id.renderButton(googleBtnWrap, { type: "standard", theme: "outline", size: "large", text: "continue_with", shape: "pill", logo_alignment: "left", width: 300 }); return true; }catch(e){ return false; }
+}
+
+async function triggerGoogleOneTap(){
+  if(!CONFIG.ENABLE_GOOGLE_ONE_TAP) return false;
+  const ok = await initializeGoogleAccounts();
+  if(!ok) return false;
+  try{ google.accounts.id.prompt(); runtime.oneTapTried = true; return true; }catch(e){ return false; }
+}
+
+async function openGoogleConsentOverlay(){
+  if(!CONFIG.ENABLE_GOOGLE_ONE_TAP) return false;
+  if(runtime.googleOverlayShown) return true;
+  runtime.googleOverlayShown = true;
+  googleOverlay.style.display = "flex";
+  const btnOk = await renderGoogleButton();
+  const promptOk = await triggerGoogleOneTap();
+  googleMini.textContent = (btnOk || promptOk)
+    ? "Janela de contas acionada. Você pode tocar na conta acima ou continuar sem login."
+    : "Não consegui abrir a autenticação Google agora. Você pode continuar e informar o e-mail manualmente.";
+  return true;
+}
+
+function showLoading(show, msg="Processando...", mini="", opts={}){
+  const o = document.getElementById("loadingOverlay");
+  const closeBtn = document.getElementById("loadCloseBtn");
+  if(show){
+    document.getElementById("loadMsg").innerText = msg;
+    const miniEl = document.getElementById("loadMini");
+    if(mini){ miniEl.style.display = "block"; miniEl.innerText = mini; }
+    else{ miniEl.style.display = "none"; miniEl.innerText = ""; }
+
+    loadingState.onClose = (opts && typeof opts.onClose === "function") ? opts.onClose : null;
+    const closable = !!(opts && opts.closable);
+    closeBtn.style.display = closable ? "inline-flex" : "none";
+    closeBtn.onclick = ()=>{
+      o.style.display = "none";
+      if(loadingState.onClose){ try{ loadingState.onClose(); }catch(e){} }
+      loadingState.onClose = null;
+    };
+    o.style.display = "flex";
+    return;
+  }
+  o.style.display = "none";
+  closeBtn.style.display = "none";
+  closeBtn.onclick = null;
+  loadingState.onClose = null;
+}
+
+function addMsg(who, text, html="", opts={}){
+  const div = document.createElement("div");
+  div.className = `msg ${who==="me"?"me":""}`;
+  const inner = (opts && opts.rawHtml) ? String(text||"") : formatRich(String(text||""));
+  div.innerHTML = `<div class="bubble ${who==="me"?"me-b":"bot-b"}"><div>${inner}</div>${html || ""}<div class="time">${nowHM()}</div></div>`;
+  chat.appendChild(div);
+  scrollToBottom();
+}
+
+let typingNode = null;
+function showTyping(show){
+  if(show){
+    if(typingNode) return;
+    const div = document.createElement("div");
+    div.className = "msg";
+    div.innerHTML = `<div class="bubble bot-b" style="max-width:120px;"><div class="typing" aria-label="digitando"><span></span><span></span><span></span></div><div class="time">${nowHM()}</div></div>`;
+    typingNode = div;
+    chat.appendChild(div);
+    scrollToBottom();
+  }else if(typingNode){ typingNode.remove(); typingNode = null; }
+}
+async function botSay(text, html="", opts={}){ showTyping(true); await delay(randDelay()); showTyping(false); addMsg("bot", text, html, opts); }
+
+const FLOW_ORDER = ["NOME","CPF","TEL","EMAIL","MAQUINAS","GPS_PROMPT","CEP","NUMERO","COMPLEMENTO","ENTREGA_MESMO","ENTREGA_END","DNASC","RG","NACIONALIDADE","PROFISSAO","ESTADO_CIVIL","MORADIA","DOCS","REF1_NOME","REF1_TEL","REF2_NOME","REF2_TEL","REF3_NOME","REF3_TEL","REFERENCIA","OBS","REVIEW"];
+function setProgress(){
+  const idx = Math.max(0, FLOW_ORDER.indexOf(state.step));
+  const pct = Math.min(100, Math.round((idx / (FLOW_ORDER.length - 1)) * 100));
+  progressBarEl.style.width = pct + "%";
+  const mapLabel = { NOME:"Identificação", CPF:"Identificação", TEL:"Contato", EMAIL:"Contato", MAQUINAS:"Máquinas", CEP:"Endereço", NUMERO:"Endereço", COMPLEMENTO:"Endereço", ENTREGA_MESMO:"Entrega", ENTREGA_END:"Entrega", DNASC:"Dados pessoais", RG:"Dados pessoais", NACIONALIDADE:"Dados pessoais", PROFISSAO:"Dados pessoais", ESTADO_CIVIL:"Dados pessoais", MORADIA:"Moradia", DOCS:"Documentos", REF1_NOME:"Referências", REF1_TEL:"Referências", REF2_NOME:"Referências", REF2_TEL:"Referências", REF3_NOME:"Referências", REF3_TEL:"Referências", REFERENCIA:"Final", OBS:"Final", REVIEW:"Revisão" };
+  stepLabelEl.textContent = mapLabel[state.step] || "Assistente de Cadastro";
+}
+function setHint(){
+  const hints = { NOME: "Ex.: Maria Aparecida da Silva", CPF: CONFIG.ACCEPT_CNPJ ? "CPF (11) ou CNPJ (14), só números" : "CPF (11), só números", TEL: "WhatsApp com DDD. Ex.: 62999999999", EMAIL: "Ex.: cliente@email.com", CEP: "CEP com 8 números", NUMERO: "Nº (ou s/n)", COMPLEMENTO: "Complemento (ou digite não)", DNASC: "Data (dd/mm/aaaa)", RG: "RG (ou digite não)" };
+  input.placeholder = hints[state.step] || "Escreva uma mensagem...";
+  if(state.step !== "EMAIL") runtime.autoEmailPromptShown = false;
+  setProgress();
+  saveState();
+}
+
+document.getElementById("logoTop").src = CONFIG.LOGO_URL;
+document.getElementById("logoStart").src = CONFIG.LOGO_URL;
+
+function lockChat(lock){
+  if(lock){ inputBarEl.classList.add("lockedInput"); sendBtn.disabled = true; }
+  else { inputBarEl.classList.remove("lockedInput"); sendBtn.disabled = false; }
+}
+function refreshConsentUI(){
+  const ok = !!policyChk.checked;
+  startBtn.disabled = !ok;
+  consentWarn.style.display = ok ? "none" : "block";
+  consentLabel.classList.toggle("checked", ok);
+}
+policyChk.addEventListener("change", refreshConsentUI);
+
+bindTap(document.getElementById("btnReset"), ()=>{
+  addMsg("bot","Quer mesmo reiniciar? Isso apaga o que já foi preenchido.", `<div style="margin-top:10px;"><button class="btn danger" data-act="RESTART_OK" type="button">Sim, reiniciar</button><button class="btn ghost" data-act="RESTART_NO" type="button">Cancelar</button></div>`);
+});
+bindTap(document.getElementById("btnHelp"), ()=>{
+  addMsg("bot","Dicas rápidas:\n\n• Digite só números em CPF/CNPJ/WhatsApp/CEP\n• Se não tiver algo, responda **não**\n• Em documentos, use boa luz e sem corte\n\nSe travar, feche e abra de novo: eu retomo do ponto certo.");
+});
+
+let lastChatActionAt = 0;
+function handleChatAction(e){
+  const btn = e.target && e.target.closest ? e.target.closest("[data-act]") : null;
+  if(!btn) return;
+
+  const now = Date.now();
+  if(now - lastChatActionAt < 220) return;
+  lastChatActionAt = now;
+
+  if(e.type !== "click"){
+    try{ e.preventDefault(); }catch(_e){}
+  }
+
+  const act = btn.getAttribute("data-act");
+  const val = btn.getAttribute("data-val") || "";
+
+  keepInputFocus();
+
+  if(act === "GPS") return getGPS();
+  if(act === "SKIP_GEO") return skipGeo();
+  if(act === "HANDLE") return handle(val, btn.textContent.trim());
+  if(act === "FILE_PICK") { const id = btn.getAttribute("data-file"); const inp = document.getElementById(id); if(inp) inp.click(); return; }
+  if(act === "QTY") return qtyChange(btn.getAttribute("data-m"), Number(btn.getAttribute("data-d")));
+  if(act === "M_CONFIRM") return confirmMaquinas();
+  if(act === "EDIT") return beginEdit(val);
+  if(act === "FINISH") return finish();
+  if(act === "SAVE_LOCAL") return openCadastroBackupWindow();
+  if(act === "SAVE_LOCAL_DISMISS") return addMsg("bot","Ok, seguimos normalmente. Se quiser, posso abrir o formulário para salvar depois.");
+  if(act === "OPEN_SERVER_BACKUP") return openServerBackupWindow(btn.getAttribute("data-html") || "");
+  if(act === "OPEN_WA") { const wa = btn.getAttribute("data-url") || ""; if(wa) window.open(wa, "_blank", "noopener"); return; }
+  if(act === "RESTART_OK"){ resetAppWithoutReload(); return; }
+  if(act === "RESTART_NO"){ addMsg("bot","Beleza. Continuamos daqui. ✅"); return; }
+  if(act === "RESTART"){ resetAppWithoutReload(); return; }
+
+  requestAnimationFrame(()=> keepInputFocus());
+}
+
+chat.addEventListener("click", handleChatAction);
+chat.addEventListener("touchend", handleChatAction, { passive:false });
+chat.addEventListener("pointerup", handleChatAction);
+
+bindTap(googleRetryBtn, async ()=>{
+  const btnOk = await renderGoogleButton();
+  const promptOk = await triggerGoogleOneTap();
+  googleMini.textContent = (btnOk || promptOk) ? "Janela de contas acionada novamente." : "Ainda não foi possível abrir. Você pode continuar sem conta Google.";
+});
+bindTap(googleSkipBtn, ()=>{ googleOverlay.style.display = "none"; startFlow(); });
+bindTap(closeOverlayBtn, ()=>{ state.started = false; saveState(); startOverlay.style.display = "none"; lockChat(true); addMsg("bot","🔒 Para continuar, toque em INICIAR na tela inicial."); });
+bindTap(startBtn, ()=>{
+  if(CONFIG.REQUIRE_PRIVACY_ACCEPT && !policyChk.checked){ refreshConsentUI(); return; }
+  state.privacyAccepted = true;
+  state.started = false;
+  saveState();
+  startOverlay.style.display = "none";
+  lockChat(false);
+  startFlow();
+});
+bindTap(sendBtn, ()=>{
+  keepInputFocus();
+  const v = input.value.trim();
+  if(!v) return;
+  if(CONFIG.REQUIRE_PRIVACY_ACCEPT && !state.privacyAccepted){ startOverlay.style.display = "flex"; refreshConsentUI(); return; }
+  if(!state.started) startFlow();
+  input.value = "";
+  addMsg("me", v);
+  process(v);
+  requestAnimationFrame(()=> keepInputFocus());
+  setTimeout(()=> keepInputFocus(), 30);
+});
+input.addEventListener("keydown", (e)=>{ if(e.key === "Enter") sendBtn.click(); });
+input.addEventListener("focus", ()=>{ if(CONFIG.REQUIRE_PRIVACY_ACCEPT && (!state.privacyAccepted || !state.started)){ startOverlay.style.display = "flex"; refreshConsentUI(); lockChat(true); } });
+
+function maquinasText(){
+  const parts = [];
+  const m = state.data.maquinas;
+  Object.keys(m).forEach(k=>{ const q = Number(m[k]||0); if(q>0) parts.push(`${k} (${q})`); });
+  const outros = String(state.data.outros||"").trim();
+  if(outros) parts.push(`Outros: ${outros}`);
+  return parts.join(" | ");
+}
+
+function suggestionChips(options){
+  const btns = options.map(o=>`<button class="btn ghost" type="button" data-act="HANDLE" data-val="TXT:${esc(o.value)}" style="margin-top:8px;">${esc(o.label)}</button>`).join("");
+  return `<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">${btns}</div>`;
+}
+
+function renderMaquinasPicker(){
+  const m = state.data.maquinas;
+  const rows = Object.keys(m).map(name=>{
+    const safeId = esc(name).replace(/\s/g,'_');
+    return `<div class="pick-row"><div class="pick-name">${esc(name)}</div><div class="qty"><button class="qbtn" type="button" data-act="QTY" data-m="${esc(name)}" data-d="-1">−</button><div class="qval" id="q_${safeId}">${Number(m[name]||0)}</div><button class="qbtn" type="button" data-act="QTY" data-m="${esc(name)}" data-d="1">+</button></div></div>`;
+  }).join("");
+  const html = `<div class="pick">${rows}<div class="otherBox"><input type="text" id="outrosInp" placeholder="Outros (opcional): ex. Zig Zag, Ombro A Ombro..." /></div><button class="btn ok full" type="button" data-act="M_CONFIRM" style="margin-top:10px;">Confirmar máquinas</button><div class="mini">Você pode selecionar mais de uma máquina.</div></div>`;
+  addMsg("bot","Quais máquinas você quer? Selecione e coloque a quantidade:", html);
+  const o = document.getElementById("outrosInp");
+  if(o){ o.value = state.data.outros || ""; o.addEventListener("input", ()=>{ state.data.outros = o.value; saveState(); }); }
+}
+
+function qtyChange(machine, delta){
+  if(!machine) return;
+  const cur = Number(state.data.maquinas[machine] || 0);
+  let next = cur + Number(delta||0);
+  if(next < 0) next = 0;
+  if(next > CONFIG.MAX_QTY_MACHINE) next = CONFIG.MAX_QTY_MACHINE;
+  state.data.maquinas[machine] = next;
+  const id = "q_" + machine.replace(/\s/g,'_');
+  const el = document.getElementById(id);
+  if(el) el.textContent = String(next);
+  saveState();
+}
+
+function confirmMaquinas(){
+  const txt = maquinasText();
+  if(!txt){
+    addMsg("bot","Você não selecionou nenhuma máquina. Quer mesmo seguir assim?", `<div style="margin-top:10px;"><button class="btn ok" type="button" data-act="HANDLE" data-val="MAQ_OK_SEM">Seguir sem escolher</button><button class="btn ghost" type="button" data-act="HANDLE" data-val="MAQ_ESCOLHER">Escolher agora</button></div>`);
+    state.step = "MAQ_DECISAO";
+    setHint();
+    return;
+  }
+  addMsg("me", txt);
+  state.step = "GPS_PROMPT";
+  setHint();
+  askGPS();
+}
+
+function askGPS(){
+  addMsg("bot","Para sua segurança, pode enviar sua localização atual (GPS)?", `<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;"><button class="btn ok" type="button" data-act="GPS">📍 Enviar GPS</button><button class="btn ghost" type="button" data-act="SKIP_GEO">Pular</button></div><div class="mini">Se preferir, você pode pular e seguir pelo CEP.</div>`);
+}
+function getGPS(){
+  addMsg("me","Enviando GPS...");
+  if(!navigator.geolocation){ addMsg("bot","Seu aparelho não suporta GPS. Vamos pelo CEP."); return skipGeo(); }
+  navigator.geolocation.getCurrentPosition((p)=>{ state.data.lat = p.coords.latitude; state.data.lng = p.coords.longitude; addMsg("bot","GPS recebido ✅"); saveState(); skipGeo(); }, ()=>{ addMsg("bot","Não consegui acessar o GPS. Vamos pelo CEP."); skipGeo(); }, { enableHighAccuracy:true, timeout:8000 });
+}
+function skipGeo(){ state.step = "CEP"; setHint(); addMsg("bot","Qual é o seu **CEP**?"); }
+
+function fetchCEP(cep){
+  const lookupId = Date.now();
+  cepLookupState.id = lookupId;
+  cepLookupState.canceled = false;
+  showLoading(true, "Consultando CEP...", "Isso costuma levar 1–3 segundos.", { closable:true, onClose:()=>{ cepLookupState.canceled = true; state.step = "EDIT_END_MANUAL"; setHint(); addMsg("bot","Busca de CEP cancelada. Vamos seguir: digite o **endereço completo** (Rua, Nº, Bairro, Cidade/UF) e complemento:"); saveState(); } });
+  return new Promise((resolve)=>{
+    if(!(window.google && google.script && google.script.run)){
+      showLoading(false);
+      state.step = "EDIT_END_MANUAL";
+      setHint();
+      addMsg("bot","Não consegui consultar CEP agora. Digite o **endereço completo** (Rua, Nº, Bairro, Cidade/UF) e complemento:");
+      saveState();
+      resolve();
+      return;
+    }
+    google.script.run
+      .withSuccessHandler((res)=>{
+        if(cepLookupState.id !== lookupId || cepLookupState.canceled){ resolve(); return; }
+        showLoading(false);
+        if(res && res.ok){
+          state.data.cep = cep;
+          state.data.logradouro = res.logradouro || "";
+          state.data.bairro = res.bairro || "";
+          state.data.cidade = res.localidade || "";
+          state.data.uf = res.uf || "";
+          addMsg("bot", `Encontrei:\n**${state.data.logradouro}**\nBairro: **${state.data.bairro}**\nCidade: **${state.data.cidade}-${state.data.uf}**`);
+          state.step = "NUMERO";
+          setHint();
+          addMsg("bot","Agora informe o **Nº** do endereço (se não tiver, digite **s/n**):");
+        } else {
+          state.step = "EDIT_END_MANUAL";
+          setHint();
+          addMsg("bot","Não encontrei o CEP. Digite o **endereço completo** (Rua, Nº, Bairro, Cidade/UF) e complemento:");
+        }
+        saveState();
+        resolve();
+      })
+      .withFailureHandler(()=>{
+        if(cepLookupState.id !== lookupId || cepLookupState.canceled){ resolve(); return; }
+        showLoading(false);
+        state.step = "EDIT_END_MANUAL";
+        setHint();
+        addMsg("bot","Falha ao consultar CEP. Digite o **endereço completo** (Rua, Nº, Bairro, Cidade/UF) e complemento:");
+        saveState();
+        resolve();
+      })
+      .getCep(cep);
+  });
+}
+
+function buildEnderecoFinal(){
+  const num = String(state.data.numero||"").trim();
+  const comp = String(state.data.complemento||"").trim();
+  const parts = [];
+  if(state.data.logradouro) parts.push(state.data.logradouro);
+  if(num) parts.push("Nº " + num);
+  if(state.data.bairro) parts.push(state.data.bairro);
+  if(state.data.cidade || state.data.uf) parts.push(`${state.data.cidade||""}-${state.data.uf||""}`.replace(/^-|-$|--/g,""));
+  if(comp) parts.push("Compl.: " + comp);
+  state.data.endereco = parts.join(", ");
+}
+
+function askFile(stepKey, msg, styleVariant=0){
+  const inputId = "file_" + stepKey;
+  const label = styleVariant===0 ? "📸 Abrir Câmera / Galeria" : "📎 Enviar próximo documento";
+  addMsg("bot", msg, `<div class="file-btn" data-act="FILE_PICK" data-file="${inputId}">${label}</div><input type="file" id="${inputId}" accept="${CONFIG.FILE_ACCEPT}" style="display:none" /><div class="mini">Dica: foto nítida, sem corte e com boa luz.</div>`);
+  const inp = document.getElementById(inputId);
+  inp.addEventListener("change", ()=> upFile(stepKey, inp), { once:false });
+}
+
+function upFile(stepKey, inp){
+  if(!inp.files || !inp.files[0]){ addMsg("bot","Nenhum arquivo selecionado. Se quiser, tente novamente."); return; }
+  const f = inp.files[0];
+  const maxMB = CONFIG.FILE_MAX_MB;
+  if(f.size > maxMB * 1024 * 1024){
+    addMsg("bot", `Esse arquivo está muito grande (${Math.round(f.size/1024/1024)}MB). Envie uma foto mais leve (até ${maxMB}MB).`);
+    runtime.fileRetry = { stepKey, inputId: inp.id };
+    addMsg("bot", "Quer tentar de novo agora?", `<div style="margin-top:10px;"><button class="btn danger" type="button" data-act="FILE_PICK" data-file="${inp.id}">Reenviar</button></div>`);
+    return;
+  }
+  addMsg("me", `📎 ${f.name}`);
+  const reader = new FileReader();
+  showLoading(true,"Carregando arquivo...","Aguarde terminar de subir.");
+  reader.onload = async (e)=>{
+    state.data.files[stepKey] = { name: f.name, type: f.type || "", data: e.target.result };
+    showLoading(false);
+    saveState();
+    await botSay(`Recebi o arquivo **${f.name}**. Processando…`);
+    if(stepKey === "FILE_SELFIE") askFile("FILE_FRENTE","Agora, a foto da **FRENTE** do seu documento (RG ou CNH).", 1);
+    else if(stepKey === "FILE_FRENTE") askFile("FILE_VERSO","Agora, a foto do **VERSO** do documento.", 1);
+    else if(stepKey === "FILE_VERSO") askFile("FILE_COMP","Para finalizar os documentos, envie um **Comprovante de Residência**.", 1);
+    else goRefsStart();
+  };
+  reader.onerror = ()=>{
+    showLoading(false);
+    runtime.fileRetry = { stepKey, inputId: inp.id };
+    addMsg("bot","⚠️ Falhou a leitura do arquivo. Pode reenviar?", `<div style="margin-top:10px;"><button class="btn danger" type="button" data-act="FILE_PICK" data-file="${inp.id}">Reenviar</button></div>`);
+  };
+  reader.readAsDataURL(f);
+}
+
+function goRefsStart(){ state.step = "REF1_NOME"; setHint(); addMsg("bot","Perfeito. Agora vamos pegar **3 referências**.\n\nRef 1: Qual o **nome completo**?"); }
+
+function showReview(){
+  state.step = "REVIEW";
+  setHint();
+  const d = state.data;
+  const refs = [ (d.ref1_nome || d.ref1_tel) ? `1) ${esc(d.ref1_nome)} — ${esc(d.ref1_tel)}` : "", (d.ref2_nome || d.ref2_tel) ? `2) ${esc(d.ref2_nome)} — ${esc(d.ref2_tel)}` : "", (d.ref3_nome || d.ref3_tel) ? `3) ${esc(d.ref3_nome)} — ${esc(d.ref3_tel)}` : "" ].filter(Boolean).join("<br>");
+  const maq = esc(maquinasText() || "-");
+  const entrega = esc(d.entrega_endereco || d.endereco || "-");
+  const resumoHtml = `<b>Revise seus dados:</b><div class="mini" style="margin-top:10px;text-align:left"><b>Nome:</b> ${esc(d.nome)}<button class="btn ghost" type="button" style="padding:4px 10px;margin:0 0 0 6px;" data-act="EDIT" data-val="NOME">Corrigir</button><br><b>CPF/CNPJ:</b> ${esc(d.cpf)}<button class="btn ghost" type="button" style="padding:4px 10px;margin:0 0 0 6px;" data-act="EDIT" data-val="CPF">Corrigir</button><br><b>E-mail:</b> ${esc(d.email)}<button class="btn ghost" type="button" style="padding:4px 10px;margin:0 0 0 6px;" data-act="EDIT" data-val="EMAIL">Corrigir</button><br><b>WhatsApp:</b> ${esc(d.tel)}<button class="btn ghost" type="button" style="padding:4px 10px;margin:0 0 0 6px;" data-act="EDIT" data-val="TEL">Corrigir</button><br><div class="hr"></div><b>Máquinas:</b> ${maq}<button class="btn ghost" type="button" style="padding:4px 10px;margin:0 0 0 6px;" data-act="EDIT" data-val="MAQUINAS">Corrigir</button><br><div class="hr"></div><b>CEP:</b> ${esc(d.cep || "-")}<br><b>Endereço:</b> ${esc(d.endereco || "-")}<br><b>Entrega:</b> ${entrega}<br><div class="hr"></div><b>Nascimento:</b> ${esc(d.data_nasc || "-")}<br><b>RG:</b> ${esc(d.rg || "-")}<br><b>Nacionalidade:</b> ${esc(d.nacionalidade || "-")}<br><b>Profissão:</b> ${esc(d.profissao || "-")}<br><b>Estado civil:</b> ${esc(d.estado_civil || "-")}<br><div class="hr"></div><b>Referências:</b><br>${refs || "-"}<br>${d.referencia ? `<div class="hr"></div><b>Referência:</b> ${esc(d.referencia)}<br>` : ``}${d.obs ? `<b>Obs:</b> ${esc(d.obs)}<br>` : ``}</div>`;
+  addMsg("bot", resumoHtml, `<div style="margin-top:12px;"><button class="btn ok full" type="button" data-act="FINISH">🚀 CONCLUIR CADASTRO</button><button class="btn ghost full" type="button" data-act="RESTART">↩️ Reiniciar</button></div><div class="mini">Ao concluir, seus dados serão enviados para a equipe Vô Máquinas.</div>`, { rawHtml: true });
+}
+
+function beginEdit(key){
+  state.edit.active = true;
+  state.edit.key = key;
+  saveState();
+  if(key === "MAQUINAS"){
+    state.step = "MAQUINAS";
+    setHint();
+    renderMaquinasPicker();
+    return;
+  }
+  const prompts = { NOME: "Certo. Digite o **nome completo** correto:", CPF: "Certo. Digite o **CPF/CNPJ** correto (somente números):", TEL: "Certo. Digite o **WhatsApp** correto com DDD:", EMAIL: "Certo. Digite o **E-mail** correto:" };
+  addMsg("bot", prompts[key] || "Digite o valor correto:");
+}
+
+function snapshotCadastro(){
+  return {
+    exportedAt: new Date().toISOString(),
+    privacyAccepted: !!state.privacyAccepted,
+    step: state.step,
+    data: JSON.parse(JSON.stringify(state.data || {})),
+    maquinas_txt: maquinasText()
+  };
+}
+function localField(label, value){ return `<tr><th style="text-align:left;padding:8px;border:1px solid #d9d9d9;background:#f5f7f8;">${esc(label)}</th><td style="padding:8px;border:1px solid #d9d9d9;">${esc(value || "—")}</td></tr>`; }
+function fileBlock(label, fileObj){
+  if(!fileObj || !fileObj.data) return "";
+  const isImg = String(fileObj.type || "").startsWith("image/");
+  const isPdf = String(fileObj.type || "").includes("pdf");
+  const preview = isImg ? `<img src="${fileObj.data}" alt="${esc(label)}" style="max-width:100%;height:auto;border:1px solid #ddd;border-radius:8px;"/>` : (isPdf ? `<embed src="${fileObj.data}" type="application/pdf" style="width:100%;height:520px;border:1px solid #ddd;border-radius:8px;"/>` : `<a href="${fileObj.data}" target="_blank" rel="noopener">Abrir arquivo</a>`);
+  return `<section style="margin-top:18px;"><h3 style="margin:0 0 8px 0;">${esc(label)}</h3><div style="margin-bottom:8px;color:#555;"><b>Arquivo:</b> ${esc(fileObj.name || "sem nome")}</div>${preview}<div style="margin-top:8px;"><a href="${fileObj.data}" download="${esc(fileObj.name || label + '.bin')}" style="color:#0a7;">Baixar este arquivo</a></div></section>`;
+}
+
+function openCadastroBackupWindow(){
+  const snap = runtime.pendingBackup || snapshotCadastro();
+  const d = snap.data || {};
+  const files = d.files || {};
+  const refs = [ `${d.ref1_nome || ""} — ${d.ref1_tel || ""}`, `${d.ref2_nome || ""} — ${d.ref2_tel || ""}`, `${d.ref3_nome || ""} — ${d.ref3_tel || ""}` ].filter(v=>v.replace(/[\s—]/g,"").length);
+
+  const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Cadastro Vô Máquinas - Salvar</title>
+  <style>
+    :root{ --bg:#f3f5f7; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --green:#25D366; --line:#e5e7eb; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .topbar{ position:sticky; top:0; z-index:9; background:#0f172a; color:#fff; padding:10px 14px; display:flex; gap:10px; align-items:center; justify-content:space-between; }
+    .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .logo{ width:38px; height:38px; border-radius:10px; border:1px solid rgba(255,255,255,.2); overflow:hidden; background:#fff; flex:0 0 auto; }
+    .logo img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .brand h1{ margin:0; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .saveBtn{ border:none; border-radius:10px; padding:10px 14px; font-weight:900; cursor:pointer; background:linear-gradient(180deg,#1dd75f,#25D366); color:#062210; }
+    .wrap{ max-width:980px; margin:16px auto; padding:0 12px 18px; }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; box-shadow:0 3px 12px rgba(0,0,0,.06); }
+    .desc{ margin:0 0 12px 0; color:var(--muted); }
+    table{ border-collapse:collapse; width:100%; }
+    th,td{ border:1px solid var(--line); padding:8px; vertical-align:top; }
+    th{ text-align:left; width:230px; background:#f8fafc; }
+    h2{ margin:18px 0 10px 0; }
+    section{ margin-top:14px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px; }
+    @media print{ .topbar{ display:none !important; } body{ background:#fff; } .wrap{ margin:0; padding:0; } .card, section{ box-shadow:none; } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"><img src="${CONFIG.LOGO_URL}" alt="Vô Máquinas" /></div>
+      <h1>Cadastro Vô Máquinas • Backup do Cliente</h1>
+    </div>
+    <button class="saveBtn" onclick="window.print()">💾 Salvar em PDF</button>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <p class="desc">Documento de segurança para envio manual no WhatsApp quando houver falha no envio automático.</p>
+      <table>
+        ${localField("Data da exportação", new Date(snap.exportedAt).toLocaleString("pt-BR"))}
+        ${localField("Nome", d.nome)}
+        ${localField("CPF/CNPJ", d.cpf)}
+        ${localField("WhatsApp", d.tel)}
+        ${localField("E-mail", d.email)}
+        ${localField("Máquinas", snap.maquinas_txt)}
+        ${localField("Nascimento", d.data_nasc)}
+        ${localField("RG", d.rg)}
+        ${localField("Nacionalidade", d.nacionalidade)}
+        ${localField("Profissão", d.profissao)}
+        ${localField("Estado civil", d.estado_civil)}
+        ${localField("Endereço principal", d.endereco)}
+        ${localField("Endereço entrega", d.entrega_endereco || d.endereco)}
+        ${localField("Referências", refs.join(" | "))}
+        ${localField("Ponto de referência", d.referencia)}
+        ${localField("Observações", d.obs)}
+      </table>
+    </div>
+
+    <h2>Fotos e documentos</h2>
+    ${fileBlock("Selfie", files.FILE_SELFIE)}
+    ${fileBlock("Documento - Frente", files.FILE_FRENTE)}
+    ${fileBlock("Documento - Verso", files.FILE_VERSO)}
+    ${fileBlock("Comprovante de Residência", files.FILE_COMP)}
+  </div>
+</body>
+</html>`;
+
+  const w = window.open("", "_blank");
+  if(!w){ addMsg("bot","Não consegui abrir nova aba. Libere pop-ups e toque em salvar cadastro novamente."); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+function offerSaveCadastroLocal(){
+  runtime.pendingBackup = snapshotCadastro();
+  addMsg("bot","Fechamos o aviso de salvamento. Quer **salvar uma cópia local do cadastro** agora?", `<div style="margin-top:10px;"><button class="btn ok" type="button" data-act="SAVE_LOCAL">💾 Salvar cadastro</button><button class="btn ghost" type="button" data-act="SAVE_LOCAL_DISMISS">Agora não</button></div><div class="mini">Ao abrir, será exibido um formulário HTML com os dados e documentos para salvar no dispositivo.</div>`);
+}
+
+function openServerBackupWindow(encodedHtml){
+  const raw = String(encodedHtml || "");
+  if(!raw){ addMsg("bot","Não recebi o backup do servidor. Vou abrir o backup local."); openCadastroBackupWindow(); return; }
+  let html = "";
+  try { html = decodeURIComponent(escape(atob(raw))); }
+  catch(e){ try { html = atob(raw); } catch(_e){ html = ""; } }
+  if(!html){ addMsg("bot","Não consegui abrir o backup remoto. Vou abrir o backup local."); openCadastroBackupWindow(); return; }
+  const w = window.open("", "_blank");
+  if(!w){ addMsg("bot","Bloqueio de pop-up detectado. Libere pop-ups para abrir o backup em PDF."); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+function getDefaultWaSupportUrl(){
+  const txt = encodeURIComponent("Olá, tivemos uma falha no envio automático do cadastro e quero enviar manualmente.");
+  return `https://api.whatsapp.com/send?phone=${onlyDigits(CONFIG.COMPANY_WA)}&text=${txt}`;
+}
+
+function offerServerRecovery(suggestion, errText){
+  const s = suggestion || {};
+  const encodedHtml = String(s.backupHtml || "");
+  const waUrl = String(s.waUrl || getDefaultWaSupportUrl());
+  const title = s.title || "Não conseguimos enviar agora";
+  const message = s.message || "Salve o cadastro e envie pelo WhatsApp da empresa.";
+  const saveLabel = s.saveButtonLabel || "💾 Salvar em PDF";
+  const waLabel = s.whatsappButtonLabel || "📲 Chamar no WhatsApp da empresa";
+
+  addMsg("bot", `⚠️ ${title}\n\n${message}\n\nDetalhe: ${esc(errText || "erro no servidor")}`, `<div style="margin-top:10px;"><button class="btn ok full" type="button" data-act="OPEN_SERVER_BACKUP" data-html="${esc(encodedHtml)}">${esc(saveLabel)}</button><button class="btn ghost full" type="button" data-act="OPEN_WA" data-url="${esc(waUrl)}">${esc(waLabel)}</button></div><div class="mini">Se o botão PDF não abrir, use o botão de salvar cadastro local abaixo.</div>`);
+}
+
+function finish(){
+  try{
+  runtime.pendingBackup = snapshotCadastro();
+  showLoading(true,"Salvando dados...","Não feche a tela agora.", { closable:true, onClose: offerSaveCadastroLocal });
+
+  const d = state.data;
+  const payload = {
+    privacyAccepted: !!state.privacyAccepted,
+    nome: d.nome,
+    cpf: d.cpf,
+    tel: d.tel,
+    email: d.email,
+    quer: d.quer,
+    maquinas_txt: maquinasText(),
+    moradia_tipo: d.moradia_tipo,
+    data_nasc: d.data_nasc,
+    rg: d.rg,
+    nacionalidade: d.nacionalidade,
+    profissao: d.profissao,
+    estado_civil: d.estado_civil,
+    ref1_nome: d.ref1_nome, ref1_tel: d.ref1_tel,
+    ref2_nome: d.ref2_nome, ref2_tel: d.ref2_tel,
+    ref3_nome: d.ref3_nome, ref3_tel: d.ref3_tel,
+    cep: d.cep,
+    endereco: d.endereco,
+    bairro: d.bairro || "",
+    cidade: (d.cidade ? `${d.cidade}-${d.uf}` : ""),
+    lat: d.lat,
+    lng: d.lng,
+    referencia: d.referencia || "",
+    obs: d.obs || "",
+    entrega_endereco: d.entrega_endereco || d.endereco,
+    files: d.files
+  };
+
+  if(!(window.google && google.script && google.script.run)){
+    showLoading(false);
+    const msg = "google.script indisponível";
+    addMsg("bot","❌ Não consegui enviar agora (google.script indisponível). Tente abrir pelo link do WebApp novamente.");
+    offerServerRecovery({}, msg);
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler((res)=>{
+      showLoading(false);
+      if(res && res.ok){
+        const waUrl = (res.waUrl || "").trim();
+        const areaClienteUrl = "https://script.google.com/macros/s/AKfycbx7XntV9P5OF8mXi04iD7T4c_wA_WBPWWf5HvKCn3SdPVZYSBlcY3oXhOJnymsSZSz1/exec";
+        const btnHtml = `<div style="margin-top:12px;">${waUrl ? `<a href="${waUrl}" target="_blank" rel="noopener" style="text-decoration:none;display:block; margin-bottom:8px;"><button class="btn ok full" type="button" style="padding:14px;font-weight:900;">📲 Confirmar no WhatsApp</button></a>` : `<div class="mini" style="margin-bottom:8px;">(WhatsApp indisponível no momento. Informe a equipe.)</div>`}<a href="${areaClienteUrl}" target="_blank" rel="noopener" style="text-decoration:none;display:block;"><button class="btn ghost full" type="button" style="padding:14px;font-weight:900;">👤 Ir para a Área do Cliente</button></a><div class="mini" style="margin-top:8px;">Você também pode acompanhar o atendimento na Área do Cliente.</div></div>`;
+        addMsg("bot", "✅ **Cadastro Realizado com Sucesso!**\n\nAgora confirme seu cadastro no WhatsApp com a equipe.", btnHtml);
+        clearState();
+        lockChat(true);
+      } else {
+        const errText = (res && res.error) ? res.error : "desconhecido";
+        offerServerRecovery(res && res.suggestion ? res.suggestion : {}, errText);
+        offerSaveCadastroLocal();
+      }
+    })
+    .withFailureHandler((err)=>{
+      showLoading(false);
+      const msg = String(err && (err.message||err) || "");
+      addMsg("bot","❌ Falha ao enviar para o servidor. Tente novamente.\n\n" + esc(msg));
+      offerServerRecovery({}, msg);
+      offerSaveCadastroLocal();
+    })
+    .submitCadastro(payload);
+  }catch(e){
+    showLoading(false);
+    const msg = String(e && (e.message || e) || "Erro inesperado no envio");
+    addMsg("bot","❌ Ocorreu um erro inesperado ao finalizar.\n\n" + esc(msg));
+    offerServerRecovery({}, msg);
+    offerSaveCadastroLocal();
+  }
+}
+
+function startFlow(){
+  if(state.started) return;
+  if(CONFIG.REQUIRE_PRIVACY_ACCEPT && !state.privacyAccepted){ startOverlay.style.display = "flex"; refreshConsentUI(); lockChat(true); return; }
+  state.started = true;
+  state.step = "NOME";
+  setHint();
+  botSay("Seja bem-vindo! Para começar, qual é o seu **nome completo**?");
+  saveState();
+}
+
+function handle(v, label){
+  if(String(v||"").startsWith("TXT:")){
+    const txt = String(v).slice(4);
+    addMsg("me", txt);
+    return process(txt);
+  }
+  addMsg("me", label);
+  process(v);
+}
+
+async function process(val){
+  val = String(val||"").trim();
+  if(!val) return;
+  if(state.edit.active){
+    const k = state.edit.key;
+    if(k === "NOME") state.data.nome = val;
+    else if(k === "CPF"){
+      const dig = onlyDigits(val);
+      if(dig.length !== 11 && !(CONFIG.ACCEPT_CNPJ && dig.length === 14)){ addMsg("bot", "CPF precisa ter **11** dígitos" + (CONFIG.ACCEPT_CNPJ ? " ou CNPJ **14** dígitos." : ".")); return; }
+      state.data.cpf = dig;
+    } else if(k === "TEL"){
+      const t = onlyDigits(val);
+      if(t.length < 10 || t.length > 13){ addMsg("bot","WhatsApp inválido. Envie com DDD (ex.: 62999999999)."); return; }
+      state.data.tel = t;
+    } else if(k === "EMAIL"){
+      if(!isValidEmail(val)){ addMsg("bot","E-mail inválido. Digite novamente (ex.: nome@dominio.com)."); return; }
+      state.data.email = val.trim();
+      runtime.autoEmail = state.data.email;
+      try{ localStorage.setItem("VM_AUTO_EMAIL", state.data.email); }catch(e){}
+    }
+    state.edit.active = false;
+    state.edit.key = "";
+    saveState();
+    showReview();
+    return;
+  }
+
+  switch(state.step){
+    case "NOME":
+      state.data.nome = val;
+      state.step = "CPF"; setHint();
+      addMsg("bot", `Prazer, ${firstName(val)}! Agora digite o seu **CPF${CONFIG.ACCEPT_CNPJ ? " ou CNPJ" : ""}** (apenas números).`);
+      break;
+
+    case "CPF": {
+      const dig = onlyDigits(val);
+      if(dig.length !== 11 && !(CONFIG.ACCEPT_CNPJ && dig.length === 14)){ addMsg("bot", "CPF precisa ter **11** dígitos" + (CONFIG.ACCEPT_CNPJ ? " ou CNPJ **14** dígitos." : ".")); return; }
+      state.data.cpf = dig;
+      state.step = "TEL"; setHint();
+      addMsg("bot","Qual é o seu **WhatsApp** com DDD?");
+      break;
+    }
+
+    case "TEL": {
+      const t = onlyDigits(val);
+      if(t.length < 10 || t.length > 13){ addMsg("bot","WhatsApp inválido. Envie com DDD (ex.: 62999999999)."); return; }
+      state.data.tel = t;
+      state.step = "EMAIL"; setHint();
+      addMsg("bot", "Agora digite seu **E-mail** (obrigatório):");
+      maybeOfferAutoEmail();
+      break;
+    }
+
+    case "EMAIL": {
+      if(val === "AUTO_EMAIL_FETCH"){
+        showLoading(true, "Lendo sua conta Google...", "Se não aparecer, digite seu e-mail normalmente.");
+        const email = await fetchEmailFromSession();
+        showLoading(false);
+        if(isValidEmail(email)){
+          runtime.autoEmail = email;
+          try{ localStorage.setItem("VM_AUTO_EMAIL", email); }catch(e){}
+          state.data.email = email;
+          addMsg("me", email);
+          await botSay(`Perfeito ✅ E-mail capturado: **${esc(email)}**`);
+          state.step = "MAQUINAS"; setHint();
+          renderMaquinasPicker();
+          saveState();
+          return;
+        } else {
+          addMsg("bot","Não consegui capturar seu e-mail automaticamente. Digite seu e-mail aqui no chat:");
+          return;
+        }
+      }
+      if(val === "AUTO_EMAIL_USE"){
+        if(isValidEmail(runtime.autoEmail)){
+          state.data.email = runtime.autoEmail.trim();
+          addMsg("me", state.data.email);
+          state.step = "MAQUINAS"; setHint();
+          await botSay(`Perfeito ✅ E-mail salvo: **${esc(state.data.email)}**`);
+          renderMaquinasPicker();
+          saveState();
+          return;
+        } else {
+          addMsg("bot","Não encontrei e-mail salvo. Digite seu e-mail aqui no chat:");
+          return;
+        }
+      }
+      if(!isValidEmail(val)){ addMsg("bot","E-mail inválido. Digite novamente (ex.: nome@dominio.com)."); return; }
+      state.data.email = val.trim();
+      runtime.autoEmail = state.data.email;
+      try{ localStorage.setItem("VM_AUTO_EMAIL", state.data.email); }catch(e){}
+      state.step = "MAQUINAS"; setHint();
+      await botSay(`Perfeito ✅ E-mail salvo: **${esc(state.data.email)}**`);
+      renderMaquinasPicker();
+      break;
+    }
+
+    case "MAQ_DECISAO":
+      if(val === "MAQ_OK_SEM"){
+        addMsg("me","Seguir sem escolher");
+        state.step = "GPS_PROMPT"; setHint();
+        askGPS();
+      } else {
+        state.step = "MAQUINAS"; setHint();
+        renderMaquinasPicker();
+      }
+      break;
+
+    case "CEP": {
+      const cep = onlyDigits(val);
+      if(cep.length !== 8){ addMsg("bot","CEP inválido. Digite os **8 números**."); return; }
+      await fetchCEP(cep);
+      break;
+    }
+
+    case "NUMERO":
+      state.data.numero = val;
+      state.step = "COMPLEMENTO"; setHint();
+      addMsg("bot","Complemento? (opcional)\nSe não tiver, digite **não**.");
+      break;
+
+    case "COMPLEMENTO":
+      state.data.complemento = isNo(val) ? "" : val;
+      buildEnderecoFinal();
+      addMsg("bot", `Confirme o endereço principal:\n\n**${state.data.endereco}**\n\nEndereço de entrega é o mesmo?`, `<div style="margin-top:10px;"><button class="btn ok" type="button" data-act="HANDLE" data-val="SIM_ENTREGA">Sim</button><button class="btn ghost" type="button" data-act="HANDLE" data-val="NAO_ENTREGA">Não</button></div>`);
+      state.step = "ENTREGA_MESMO"; setHint();
+      break;
+
+    case "EDIT_END_MANUAL":
+      state.data.endereco = val;
+      addMsg("bot","Endereço de entrega é o mesmo?", `<div style="margin-top:10px;"><button class="btn ok" type="button" data-act="HANDLE" data-val="SIM_ENTREGA">Sim</button><button class="btn ghost" type="button" data-act="HANDLE" data-val="NAO_ENTREGA">Não</button></div>`);
+      state.step = "ENTREGA_MESMO"; setHint();
+      break;
+
+    case "ENTREGA_MESMO":
+      if(val === "SIM_ENTREGA"){
+        state.data.entrega_endereco = state.data.endereco;
+        state.step = "DNASC"; setHint();
+        addMsg("bot","Agora me diga sua **Data de Nascimento** (dd/mm/aaaa):");
+      } else {
+        state.step = "ENTREGA_END"; setHint();
+        addMsg("bot","Digite o **endereço de entrega** completo:");
+      }
+      break;
+
+    case "ENTREGA_END":
+      state.data.entrega_endereco = val;
+      state.step = "DNASC"; setHint();
+      addMsg("bot","Agora me diga sua **Data de Nascimento** (dd/mm/aaaa):");
+      break;
+
+    case "DNASC":
+      if(!isDateBR(val)){ addMsg("bot","Formato inválido. Digite: **dd/mm/aaaa**."); return; }
+      state.data.data_nasc = val;
+      state.step = "RG"; setHint();
+      addMsg("bot","Agora digite seu **RG** (se não tiver, digite **não**):");
+      break;
+
+    case "RG":
+      state.data.rg = isNo(val) ? "" : val;
+      state.step = "NACIONALIDADE"; setHint();
+      addMsg("bot","Sua **Nacionalidade**?", suggestionChips([{label:"🇧🇷 Brasileira", value:"Brasileira"},{label:"📄 Brasileira (naturalizada)", value:"Brasileira naturalizada"},{label:"🌍 Estrangeira", value:"Estrangeira"}]));
+      break;
+
+    case "NACIONALIDADE":
+      state.data.nacionalidade = val;
+      state.step = "PROFISSAO"; setHint();
+      addMsg("bot","Qual sua **Profissão**?", suggestionChips([{label:"🧵 Costureiro(a)", value:"Costureiro(a)"},{label:"💼 Empresário(a)", value:"Empresário(a)"},{label:"🔧 Autônomo(a)", value:"Autônomo(a)"},{label:"🏠 Dona de casa", value:"Dona de casa"}]));
+      break;
+
+    case "PROFISSAO":
+      state.data.profissao = val;
+      state.step = "ESTADO_CIVIL"; setHint();
+      addMsg("bot","Qual seu **Estado Civil**?", suggestionChips([{label:"🙂 Solteiro(a)", value:"Solteiro(a)"},{label:"💍 Casado(a)", value:"Casado(a)"},{label:"🤝 União estável", value:"União estável"},{label:"🧾 Divorciado(a)", value:"Divorciado(a)"},{label:"🕊️ Viúvo(a)", value:"Viúvo(a)"}]));
+      break;
+
+    case "ESTADO_CIVIL":
+      state.data.estado_civil = val;
+      state.step = "MORADIA"; setHint();
+      addMsg("bot","O local onde ficará a(s) máquina(s) é **próprio** ou **alugado**?", `<div style="margin-top:10px;"><button class="btn ok" type="button" data-act="HANDLE" data-val="MORADIA_PROPRIO">Próprio</button><button class="btn" type="button" data-act="HANDLE" data-val="MORADIA_ALUGADO">Alugado</button><button class="btn ghost" type="button" data-act="HANDLE" data-val="MORADIA_OUTRO">Outro</button></div>`);
+      break;
+
+    case "MORADIA":
+      if(val === "MORADIA_PROPRIO") state.data.moradia_tipo = "Próprio";
+      else if(val === "MORADIA_ALUGADO") state.data.moradia_tipo = "Alugado";
+      else state.data.moradia_tipo = "Outro";
+      state.step = "DOCS"; setHint();
+      askFile("FILE_SELFIE","Agora, tire uma **Selfie**.");
+      break;
+
+    case "REF1_NOME":
+      state.data.ref1_nome = val;
+      state.step = "REF1_TEL"; setHint();
+      addMsg("bot","Ref 1: Qual o **WhatsApp** com DDD?");
+      break;
+
+    case "REF1_TEL":
+      state.data.ref1_tel = onlyDigits(val);
+      state.step = "REF2_NOME"; setHint();
+      addMsg("bot","Ref 2: Qual o **nome completo**?");
+      break;
+
+    case "REF2_NOME":
+      state.data.ref2_nome = val;
+      state.step = "REF2_TEL"; setHint();
+      addMsg("bot","Ref 2: Qual o **WhatsApp** com DDD?");
+      break;
+
+    case "REF2_TEL":
+      state.data.ref2_tel = onlyDigits(val);
+      state.step = "REF3_NOME"; setHint();
+      addMsg("bot","Ref 3: Qual o **nome completo**?");
+      break;
+
+    case "REF3_NOME":
+      state.data.ref3_nome = val;
+      state.step = "REF3_TEL"; setHint();
+      addMsg("bot","Ref 3: Qual o **WhatsApp** com DDD?");
+      break;
+
+    case "REF3_TEL":
+      state.data.ref3_tel = onlyDigits(val);
+      state.step = "REFERENCIA"; setHint();
+      addMsg("bot","Tem algum ponto de **referência**? (opcional)\nSe não tiver, digite **não**.");
+      break;
+
+    case "REFERENCIA":
+      state.data.referencia = isNo(val) ? "" : val;
+      state.step = "OBS"; setHint();
+      addMsg("bot","Observações? (opcional)\nSe não quiser, digite **não**.");
+      break;
+
+    case "OBS":
+      state.data.obs = isNo(val) ? "" : val;
+      saveState();
+      showReview();
+      break;
+
+    default:
+      addMsg("bot","Se quiser reiniciar, toque em reiniciar no topo. ✅");
+  }
+
+  saveState();
+}
+
+(function patchHandle(){
+  const original = handle;
+  window.handle = function(v, label){
+    if(String(v||"").startsWith("TXT:")) return original(v, label);
+    if(v === "SIM_ENTREGA"){ addMsg("me","Sim"); return process(v); }
+    if(v === "NAO_ENTREGA"){ addMsg("me","Não"); return process(v); }
+    if(v === "MORADIA_PROPRIO"){ addMsg("me","Próprio"); return process(v); }
+    if(v === "MORADIA_ALUGADO"){ addMsg("me","Alugado"); return process(v); }
+    if(v === "MORADIA_OUTRO"){ addMsg("me","Outro"); return process(v); }
+    if(v === "MAQ_OK_SEM"){ addMsg("me","Seguir sem escolher"); return process(v); }
+    if(v === "MAQ_ESCOLHER"){ addMsg("me","Escolher agora"); return process(v); }
+    original(v, label);
+  }
+})();
+
+(function boot(){
+  loadState();
+  setHint();
+
+  policyChk.checked = !!state.privacyAccepted;
+  refreshConsentUI();
+
+  // Regra pedida: sempre abrir pela tela inicial (login/aceite), em qualquer dispositivo.
+  if(CONFIG.REQUIRE_PRIVACY_ACCEPT){
+    state.started = false;
+    saveState();
+    startOverlay.style.display = "flex";
+    lockChat(true);
+  }else{
+    startOverlay.style.display = "none";
+    lockChat(false);
+  }
+
+  if(state.started){
+    if(CONFIG.REQUIRE_PRIVACY_ACCEPT && !state.privacyAccepted){
+      startOverlay.style.display = "flex";
+      lockChat(true);
+    }else{
+      resumePill.style.display = "inline-flex";
+      addMsg("bot","✅ Retomei seu cadastro do ponto onde você parou. Toque em INICIAR para continuar.");
+    }
+  }
+
+  document.getElementById("logoTop").src = CONFIG.LOGO_URL;
+  document.getElementById("logoStart").src = CONFIG.LOGO_URL;
+
+  syncAppToViewport();
+  setTimeout(()=> keepInputFocus(), 250);
+})();
+</script>
+</body>
+</html>
