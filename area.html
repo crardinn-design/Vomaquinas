@@ -1,0 +1,1568 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="utf-8" />
+  <meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b141a" />
+  <meta name="color-scheme" content="dark" />
+  <title>Vô Máquinas • Área do Cliente</title>
+
+  <style>
+    :root{
+      --bg:#0b141a;
+      --panel:#121b22;
+      --panel2:#0f171d;
+      --stroke:rgba(255,255,255,.10);
+      --text:#e9edef;
+      --muted:rgba(255,255,255,.86);
+      --green:#25D366;
+      --green2:#1dd75f;
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+
+      --radius: 18px;
+      --radius2: 22px;
+
+      --barH: 78px;
+      --maxW: 1800px;
+
+      --pix-green:#25D366;
+      --pix-yellow:#FFCC00;
+      --pix-orange:#FF8A00;
+      --pix-red:#FF3B30;
+
+      /* escala inteligente */
+      --fs-12: clamp(14px, 3.5vw, 15px);
+      --fs-13: clamp(15px, 3.9vw, 17px);
+      --fs-14: clamp(16px, 4.3vw, 18px);
+      --fs-16: clamp(19px, 5.0vw, 22px);
+      --fs-18: clamp(21px, 5.6vw, 24px);
+      --fs-20: clamp(23px, 6.2vw, 27px);
+
+      --pad: clamp(12px, 3.4vw, 16px);
+      --gap: clamp(10px, 3vw, 12px);
+
+      /* Safe-area */
+      --safeT: env(safe-area-inset-top);
+      --safeB: env(safe-area-inset-bottom);
+      --safeL: env(safe-area-inset-left);
+      --safeR: env(safe-area-inset-right);
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+    html,body{
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      height:100%;
+      margin:0;
+      overflow-x:hidden;
+      background:
+        radial-gradient(900px 380px at 25% 0%, rgba(37,211,102,.16), transparent 60%),
+        radial-gradient(900px 380px at 80% 10%, rgba(0,170,255,.12), transparent 60%),
+        linear-gradient(180deg, rgba(11,20,26,.96), rgba(6,10,14,1));
+      background-attachment: scroll;
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Desktop: parallax ok */
+    @media (min-width: 768px){
+      body{ background-attachment: fixed; }
+    }
+
+    .wrap{
+      width:100%;
+      max-width: var(--maxW);
+      margin: 0 auto;
+      padding: var(--pad) clamp(12px,3vw,32px) calc(var(--barH) + var(--safeB) + var(--pad));
+    }
+
+    body.login-mode .wrap{
+      min-height: calc((var(--vh, 1vh) * 100) - var(--safeT) - var(--safeB));
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding-top: max(var(--pad), calc(var(--safeT) + 10px));
+      padding-bottom: max(var(--pad), calc(var(--safeB) + 12px));
+    }
+
+    .hero{
+      position: relative;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background:
+        radial-gradient(1200px 420px at 30% 10%, rgba(37,211,102,.15), transparent 60%),
+        radial-gradient(900px 360px at 70% 0%, rgba(0,170,255,.12), transparent 60%),
+        #0e171d;
+    }
+
+    .heroShade{
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.40)),
+        radial-gradient(900px 320px at 15% 20%, rgba(37,211,102,.12), transparent 60%);
+      pointer-events:none;
+      z-index: 1;
+    }
+
+    .heroInner{
+      position: relative;
+      z-index: 2;
+      padding: var(--pad);
+      min-height: clamp(150px, 18vw, 185px);
+      display:flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: var(--gap);
+    }
+
+    .brandRow{
+      display:grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+        "logo actions"
+        "text text";
+      gap: 12px;
+      align-items:start;
+    }
+
+    .logo{
+      grid-area: logo;
+      /* Logo bem maior (tamanho do balão) */
+      width: clamp(84px, 14vw, 120px);
+      height: clamp(84px, 14vw, 120px);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.20);
+      background: rgba(0,0,0,.28);
+      overflow:hidden;
+      flex: 0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 950;
+      letter-spacing:.5px;
+      box-shadow: 0 22px 55px rgba(0,0,0,.42);
+    }
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit: contain;
+      display:block;
+      padding: 10px;
+      transform: scale(1.25);
+      border-radius: 30px;
+    }
+    .logo.fallback{ background: rgba(37,211,102,.14); border-color: rgba(37,211,102,.30); }
+    .logo.fallback::after{ content:"VÔ"; }
+
+    .brandTxt{
+      grid-area: text;
+      line-height: 1.08;
+    }
+    .brandTxt .name{
+      font-weight: 950;
+      font-size: var(--fs-20);
+      letter-spacing: .2px;
+      text-shadow: 0 8px 20px rgba(0,0,0,.45);
+    }
+    .brandTxt .tag{
+      margin-top: 6px;
+      font-size: var(--fs-13);
+      color: rgba(255,255,255,.94);
+      text-shadow: 0 8px 20px rgba(0,0,0,.55);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      max-width: min(720px, 100%);
+    }
+
+    .heroActions{
+      grid-area: actions;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+      justify-content:flex-start;
+    }
+
+    /* Em telas maiores, fica tudo na mesma linha: logo + texto + botões */
+    @media (min-width: 680px){
+      .brandRow{
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas: "logo text actions";
+        align-items:center;
+      }
+      .heroActions{ flex-direction: row; align-items:center; }
+    }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(18,27,34,.70);
+      color: var(--text);
+      padding: 11px 13px;
+      border-radius: 14px;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-weight: 950;
+      font-size: var(--fs-13);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      cursor:pointer;
+      user-select:none;
+      touch-action: manipulation;
+      position: relative;
+      z-index: 3;
+      text-decoration:none;
+    }
+    .btn.primary{
+      background: rgba(37,211,102,.18);
+      border-color: rgba(37,211,102,.35);
+    }
+
+    .btn{
+      text-align:center;
+      white-space: normal;
+    }
+
+    .card{
+      margin-top: 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(18,27,34,.92);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    /* ajuste solicitado: sem hero e login centralizado/menor */
+    #viewLogin{
+      width: min(620px, 100%);
+      max-width: min(620px, 100%);
+      margin: 0 auto;
+    }
+
+    .cardHd{ padding: 16px 16px 10px; }
+    .cardHd h2{ margin:0; font-size: var(--fs-20); font-weight: 950; letter-spacing:.3px; }
+    .cardHd p{ margin:8px 0 0; font-size: var(--fs-16); color: rgba(255,255,255,.94); line-height: 1.4; }
+
+    .contentPad{ padding: 14px 16px 16px; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+    label{ font-size: var(--fs-13); color: var(--muted); }
+
+    input{
+      height: 52px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      padding: 0 12px;
+      outline:none;
+      font-size: 17px; /* iOS: evita zoom */
+    }
+    input::placeholder{ color: rgba(233,237,239,.45); }
+    .help{ font-size: var(--fs-12); color: rgba(255,255,255,.82); margin-top: 6px; }
+
+    .error{
+      margin-top:10px;
+      font-size: var(--fs-13);
+      color: #ffd3d3;
+      background: rgba(255,77,77,.12);
+      border:1px solid rgba(255,77,77,.28);
+      padding: 10px 12px;
+      border-radius: 16px;
+      display:none;
+    }
+
+    .hintBox{
+      margin-top: 10px;
+      font-size: var(--fs-13);
+      color: rgba(233,237,239,.95);
+      background: rgba(37,211,102,.10);
+      border:1px solid rgba(37,211,102,.30);
+      padding: 10px 12px;
+      border-radius: 16px;
+      display:none;
+    }
+    .hintBox a{
+      color: #7dffb0;
+      font-weight: 900;
+      text-decoration: underline;
+    }
+
+    .row{ display:flex; gap: 10px; flex-wrap:wrap; margin-top: 12px; }
+    .row > *{ flex:1 1 220px; }
+
+    .btnMain{
+      border:none;
+      border-radius: 16px;
+      padding: 15px 14px;
+      font-weight: 950;
+      font-size: var(--fs-14);
+      background: linear-gradient(135deg, var(--green), var(--green2));
+      color: #05210f;
+      cursor:pointer;
+      box-shadow: 0 12px 26px rgba(37,211,102,.22);
+      touch-action: manipulation;
+    }
+    .btnMain.secondary{
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      box-shadow:none;
+      font-weight: 900;
+    }
+
+    .list{ padding: 14px 16px 16px; }
+
+    .item{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      border-radius: 22px;
+      padding: 16px 16px;
+      margin-top: 14px;
+      width:100%;
+      display:grid;
+      grid-template-columns: 42px 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 10px 12px;
+      align-items:center;
+    }
+
+    .ico{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .txt{
+      min-width:0;
+      grid-column: 2;
+      grid-row: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .txt b{ font-size: var(--fs-18); font-weight: 950; letter-spacing: .2px; white-space: normal; line-height: 1.2; }
+    .txt span{ font-size: var(--fs-16); color: rgba(255,255,255,.94); line-height: 1.35; white-space: normal; display:block; }
+    .txt .obs{ margin-top: 6px; font-size: var(--fs-14); color: rgba(255,255,255,.92); line-height: 1.35; white-space: normal; display:block; }
+
+    .pill{
+      grid-column: 3;
+      grid-row: 1;
+      justify-self:end;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: var(--fs-12);
+      font-weight: 950;
+      white-space: nowrap;
+    }
+    .pill.ok{ border-color: rgba(37,211,102,.35); background: rgba(37,211,102,.12); }
+    .pill.warn{ border-color: rgba(255,204,0,.35); background: rgba(255,204,0,.10); }
+    .pill.danger{ border-color: rgba(255,77,77,.40); background: rgba(255,77,77,.12); }
+
+    .payWrap{
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width:100%;
+      display:flex;
+      justify-content:flex-start;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 2px;
+    }
+
+    .payBtn{
+      flex: 0 1 auto;
+      max-width: 260px;
+      border:none;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: 950;
+      font-size: var(--fs-13);
+      cursor:pointer;
+      color:#06130b;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.22);
+      text-align:center;
+      touch-action: manipulation;
+      min-height: 44px;
+    }
+
+    .pay-green{ background: linear-gradient(135deg, var(--pix-green), #56ff9a); }
+    .pay-yellow{ background: linear-gradient(135deg, var(--pix-yellow), #ffe680); }
+    .pay-orange{ background: linear-gradient(135deg, var(--pix-orange), #ffb15a); }
+    .pay-red{ background: linear-gradient(135deg, var(--pix-red), #ff7a73); color:#2b0505; }
+
+    @keyframes pulsePay {
+      0%{ transform: scale(1); filter: brightness(1); }
+      50%{ transform: scale(1.03); filter: brightness(1.08); }
+      100%{ transform: scale(1); filter: brightness(1); }
+    }
+    .pulse{ animation: pulsePay 1.05s ease-in-out infinite; }
+
+    @media (max-width: 768px){
+      /* iPhone/Android: login fluido como a área do cliente */
+      body.login-mode .wrap{
+        min-height: auto;
+        display:block;
+        padding-top: max(var(--pad), calc(var(--safeT) + 8px));
+        padding-bottom: max(var(--pad), calc(var(--safeB) + 10px));
+      }
+      #viewLogin{
+        width: 100%;
+        max-width: 100%;
+      }
+      #viewLogin .brandRow{
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "logo"
+          "text"
+          "actions";
+        justify-items:center;
+        gap: 10px;
+      }
+      #viewLogin .brandTxt{
+        width: 100%;
+        text-align:center;
+      }
+      #viewLogin .brandTxt .tag{
+        white-space: normal;
+        text-overflow: clip;
+      }
+      #viewLogin .heroActions{
+        width:100%;
+        align-items:stretch;
+      }
+      #viewLogin .heroActions .btn{
+        width:100%;
+        justify-content:center;
+      }
+      #viewLogin .row > *{
+        flex: 1 1 100%;
+      }
+    }
+
+    @media (max-width: 640px){
+      /* Mobile: reduz custo do blur (Safari) */
+      .btn, .bottomBar, .modal{ -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+      #viewLogin{
+        margin-top: 0;
+        border-radius: 18px;
+      }
+      #viewLogin .cardHd,
+      #viewLogin .contentPad{
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .item{
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+        gap: 10px;
+        padding: 12px 12px;
+        border-radius: 16px;
+        text-align:center;
+        justify-items:center;
+      }
+      .ico{ grid-column: 1; grid-row: 1; justify-self:center; }
+      .txt{ grid-column: 1; grid-row: 2; align-items:center; }
+      .pill{ grid-column: 1; grid-row: 3; justify-self:center; padding: 7px 12px; }
+      .payWrap{ grid-column: 1; grid-row: 4; width:100%; justify-content:center; margin-top: 2px; }
+      .payBtn{ width: min(320px, 100%); max-width: 320px; }
+    }
+
+    .modal{
+      position: fixed; inset: 0;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding: 12px;
+      background: rgba(0,0,0,.55);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      overscroll-behavior: contain;
+    }
+    .modalCard{
+      width: min(520px, 100%);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      background: rgba(11,20,26,.95);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      max-height: calc(var(--vh, 1vh) * 100 - var(--safeT) - var(--safeB) - 16px);
+      display:flex;
+      flex-direction: column;
+    }
+    .modalTop{
+      padding: 12px 12px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .modalTop b{ font-size: var(--fs-14); font-weight: 950; }
+    .xBtn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 9px 11px;
+      cursor:pointer;
+      font-weight: 950;
+      white-space:nowrap;
+      touch-action: manipulation;
+    }
+    .modalBody{ padding: 12px; overflow:auto; -webkit-overflow-scrolling: touch; }
+
+    .qrBox{
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .qrBox img{
+      width: 160px; height: 160px;
+      border-radius: 14px;
+      background: #fff;
+      padding: 6px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+    .pixInfo{
+      flex:1 1 220px;
+      min-width:0;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: 6px;
+    }
+    .pixInfo p{ margin: 0; }
+    .pixInfo .sub{ margin-top: 6px; font-size: var(--fs-13); color: var(--muted); }
+
+    textarea{
+      width:100%;
+      min-height: 98px;
+      resize:none;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      padding: 10px 12px;
+      outline:none;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+
+    .modalActions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .modalActions > *{ flex: 1 1 220px; }
+
+    .mini{ font-size: var(--fs-12); color: rgba(255,255,255,.78); text-align:center; margin-top:10px; padding: 0 8px 12px; }
+
+    .bottomBar{
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      height: calc(var(--barH) + var(--safeB));
+      padding-bottom: var(--safeB);
+      background: rgba(10,16,20,.86);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255,255,255,.08);
+      z-index: 1500;
+    }
+    .barInner{
+      max-width: var(--maxW);
+      margin: 0 auto;
+      height: 100%;
+      display:flex;
+      gap: 10px;
+      padding: 10px 12px calc(12px + var(--safeB));
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navBtn{
+      flex: 1;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      border-radius: 16px;
+      height: 54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      font-weight: 950;
+      font-size: var(--fs-13);
+      color: var(--text);
+      box-shadow: 0 10px 26px rgba(0,0,0,.20);
+      cursor:pointer;
+      user-select:none;
+      touch-action: manipulation;
+    }
+    .navBtn.primary{ border-color: rgba(37,211,102,.35); background: rgba(37,211,102,.16); }
+
+    @media (max-width: 520px){
+      .heroInner{ min-height: 160px; }
+      .qrBox img{ width: 150px; height: 150px; }
+      .btn{ padding: 12px 13px; }
+    }
+
+    @media (max-width: 420px){
+      .wrap{ padding-left: 12px; padding-right: 12px; }
+      .brandTxt .name{ font-size: clamp(21px, 6.0vw, 24px); }
+      .brandTxt .tag{ font-size: clamp(13px, 4.0vw, 15px); }
+      input{ height: 50px; border-radius: 16px; }
+      .navBtn{ height: 52px; }
+    }
+
+    @supports (-webkit-touch-callout: none){
+      body{ -webkit-overflow-scrolling: touch; }
+    }
+
+    .hidden{ display:none !important; }
+
+    .loading{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 1600;
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+    }
+    .spinner{
+      width:46px; height:46px;
+      border-radius:50%;
+      border:4px solid rgba(255,255,255,.18);
+      border-top-color: var(--green);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="login-mode">
+  <div class="wrap">
+
+    <!-- LOGIN -->
+    <section class="card" id="viewLogin" aria-label="Login">
+      <div class="cardHd">
+        <div class="brandRow">
+          <div class="logo" id="logoBox">
+            <img id="logoImg" alt="Logo Vô Máquinas"
+                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFt0p6z1TfdNuhMDmTpJloEzyZ4zGNg6XpoA&s"
+                 loading="eager" decoding="async" />
+          </div>
+
+          <div class="heroActions">
+            <a class="btn primary" id="btnCadastro" href="#" target="_blank" rel="noopener">✅ Cadastro rápido</a>
+            <a class="btn" id="btnWppTopo" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <button class="btn" id="btnSair" type="button" style="display:none;">🚪 Sair</button>
+          </div>
+
+          <div class="brandTxt">
+            <div class="name">Vô Máquinas</div>
+            <div class="tag">Área do Cliente • pagamentos, contratos e suporte</div>
+          </div>
+        </div>
+
+        <h2>Entrar</h2>
+        <p>Digite seus dados para ver contratos, vencimentos, Pix e suporte.</p>
+      </div>
+
+      <div class="contentPad">
+        <div class="field">
+          <label>CPF (somente números)</label>
+          <input id="cpf" inputmode="numeric" autocomplete="off" placeholder="Ex: 04450931107" maxlength="11" />
+        </div>
+
+        <div class="field">
+          <label>4 últimos dígitos do WhatsApp</label>
+          <input id="tel4" inputmode="numeric" autocomplete="off" placeholder="Ex: 5261" maxlength="4" />
+          <div class="help">Isso é só pra confirmar que é você. 😉</div>
+        </div>
+
+        <div class="error" id="errBox"></div>
+        <div class="hintBox" id="cadastroHint">CPF não localizado. <a id="cadastroHintLink" href="#" target="_blank" rel="noopener">Fazer cadastro agora</a>.</div>
+
+        <div class="row">
+          <button class="btnMain" id="btnEntrar" type="button">Entrar</button>
+          <button class="btnMain secondary" id="btnWhats" type="button">Falar no WhatsApp</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="viewDash" class="hidden" aria-label="Dashboard">
+
+      <section class="card" aria-label="Resumo">
+        <div class="cardHd">
+          <h2 id="hello">Olá 👋</h2>
+          <p id="helloSub">Carregando seus dados...</p>
+        </div>
+
+        <div class="contentPad">
+          <div class="row">
+            <button class="btnMain secondary" id="btn2via" type="button">📄 2ª via / comprovantes</button>
+            <button class="btnMain secondary" id="btnSuporte" type="button">🛠️ Abrir suporte</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Contratos">
+        <div class="cardHd">
+          <h2>Seus contratos</h2>
+          <p>Status, máquina, vencimento, OBS e pagamento.</p>
+        </div>
+        <div class="list" id="listContratos"></div>
+      </section>
+
+      <section class="card" aria-label="Pendências">
+        <div class="cardHd">
+          <h2>Pendências</h2>
+          <p id="pendSub">Resumo e ações importantes.</p>
+        </div>
+        <div class="contentPad" id="pendTop"></div>
+        <div class="list" id="listPendencias"></div>
+      </section>
+
+      <section class="card" aria-label="Ações">
+        <div class="cardHd">
+          <h2>Ações rápidas</h2>
+          <p>O que você precisa, em 1 clique.</p>
+        </div>
+        <div class="contentPad">
+          <div class="row">
+            <button class="btnMain" id="btnRenovar" type="button">🤝 Renovar / negociar</button>
+            <button class="btnMain secondary" id="btnLocal" type="button">📍 Enviar localização</button>
+          </div>
+        </div>
+
+        <div class="mini">Aqui não é só aluguel. É parceria. 🤝</div>
+      </section>
+
+    </section>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <nav class="bottomBar hidden" id="bottomBar" aria-label="Menu inferior">
+    <div class="barInner">
+      <button class="navBtn" id="navCadastro" type="button">✅ Cadastro</button>
+      <button class="navBtn primary" id="navCliente" type="button">👤 Cliente</button>
+      <button class="navBtn" id="navWpp" type="button">💬 WhatsApp</button>
+    </div>
+  </nav>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading"><div class="spinner"></div></div>
+
+  <!-- PIX MODAL -->
+  <div class="modal" id="pixModal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-label="Pagamento Pix">
+      <div class="modalTop">
+        <b id="pixTitle">Pagamento Pix</b>
+        <button class="xBtn" id="pixClose" type="button">Fechar</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="qrBox">
+          <img id="pixQr" alt="QR Pix" src="" />
+          <div class="pixInfo">
+            <p class="sub" id="pixSub">Aponte a câmera ou use o Copia e Cola.</p>
+            <p class="sub" id="pixMeta"></p>
+          </div>
+        </div>
+
+        <textarea id="pixCopia" readonly></textarea>
+
+        <div class="modalActions">
+          <button class="btnMain" id="pixCopyBtn" type="button">Copiar Pix (Copia e Cola)</button>
+          <button class="btnMain secondary" id="pixWppBtn" type="button">Enviar no WhatsApp</button>
+        </div>
+      </div>
+
+      <div class="mini">Se não conseguir pagar agora, chama no WhatsApp que a gente resolve. ✅</div>
+    </div>
+  </div>
+
+  <script>
+    var CONFIG = {
+      whatsappPhone: "5562994091954",
+      cadastroWebAppUrl: "https://script.google.com/macros/s/AKfycbwPkJE9tj4xnPq05zI61b_2SlPaHPiA8-_O_O0NltxEKrQjIEhWGe-sW172wihBPYmD/exec",
+
+      // Login fake TEMPORÁRIO (pra você testar o layout sem GAS)
+      enableFakeLogin: false,
+      fakeCpf: "12345678900",
+      fakeTel4: "0000",
+
+      debug: true
+    };
+
+    function $(id){ return document.getElementById(id); }
+    function show(el, on){ if (!el) return; if (on) el.classList.remove("hidden"); else el.classList.add("hidden"); }
+    function setLoading(on){ var l = $("loading"); if (l) l.style.display = on ? "flex" : "none"; }
+    function onlyDigits(s){ return String(s || "").replace(/\D/g, ""); }
+
+    function setError(msg){
+      var box = $("errBox");
+      if (!box) return;
+      if (!msg){ box.style.display = "none"; box.textContent = ""; return; }
+      box.style.display = "block";
+      box.textContent = msg;
+    }
+
+    function setCadastroHint(on){
+      var box = $("cadastroHint");
+      if (!box) return;
+      box.style.display = on ? "block" : "none";
+    }
+
+    function isCpfNaoLocalizado(msg){
+      var t = String(msg || "").toLowerCase();
+      return (t.indexOf("cpf") !== -1) && (
+        t.indexOf("não localizado") !== -1 ||
+        t.indexOf("nao localizado") !== -1 ||
+        t.indexOf("não encontrado") !== -1 ||
+        t.indexOf("nao encontrado") !== -1
+      );
+    }
+
+    function showBottomBar(on){
+      var bar = $("bottomBar");
+      if (!bar) return;
+      if (on) bar.classList.remove("hidden");
+      else bar.classList.add("hidden");
+    }
+
+    function setLoginMode(on){
+      if (!document.body || !document.body.classList) return;
+      if (on) document.body.classList.add("login-mode");
+      else document.body.classList.remove("login-mode");
+    }
+
+    function lockKeyboardZoom(){
+      var m = viewportMetaEl();
+      if (!m) return;
+      m.setAttribute("content", "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, minimum-scale=1, user-scalable=no");
+    }
+
+    function wppLink(text){
+      var msg = encodeURIComponent(text || "Olá! Vim pela Área do Cliente da Vô Máquinas.");
+      return "https://api.whatsapp.com/send?phone=" + CONFIG.whatsappPhone + "&text=" + msg;
+    }
+
+    function escapeHtml(s){
+      return String(s || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/\"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+    }
+
+    // --------- URL PARAMS + AUTO OPEN ----------
+    function getQueryParam(name){
+      try{
+        var u = new URL(window.location.href);
+        return u.searchParams.get(name);
+      }catch(e){
+        // fallback simples
+        var qs = window.location.search || "";
+        qs = qs.replace(/^\?/,"");
+        var parts = qs.split("&");
+        for (var i=0;i<parts.length;i++){
+          var kv = parts[i].split("=");
+          if (decodeURIComponent(kv[0]||"") === name) return decodeURIComponent(kv[1]||"");
+        }
+        return null;
+      }
+    }
+
+    // Se URL tem ?open=pix, vamos tentar abrir Pix automaticamente 1 vez após login
+    var AUTO_OPEN = {
+      mode: (String(getQueryParam("open") || "").toLowerCase()),
+      tried: false
+    };
+
+    function shouldAutoOpenPix(){
+      return AUTO_OPEN.mode === "pix";
+    }
+
+    function markAutoOpenTried(){
+      AUTO_OPEN.tried = true;
+      // opcional: limpa o param pra não reabrir se o usuário der refresh
+      try{
+        var u = new URL(window.location.href);
+        u.searchParams.delete("open");
+        window.history.replaceState({}, "", u.toString());
+      }catch(e){}
+    }
+
+    function maybeAutoOpenPix(resp){
+      if (!shouldAutoOpenPix()) return;
+      if (AUTO_OPEN.tried) return;
+      markAutoOpenTried();
+
+      // Prioridade: payAll
+      var payAll = resp && resp.payAll ? resp.payAll : null;
+      if (payAll && payAll.show && (payAll.copiaCola || payAll.qrDataUrl)){
+        var s = resp.summary || {};
+        var meta = "Pagar todos" +
+          (payAll.amount ? (" • R$ " + payAll.amount) : "") +
+          (s.nextDue ? (" • Próx. venc.: " + s.nextDue) : "");
+        openPixModal("Pagamento Pix • Todos os contratos", "Aponte a câmera ou use o Copia e Cola.", meta, payAll.qrDataUrl || "", payAll.copiaCola || "");
+        return;
+      }
+
+      // Senão: primeiro contrato pagável
+      var contratos = (resp && resp.contratos && resp.contratos.length) ? resp.contratos : [];
+      for (var i=0;i<contratos.length;i++){
+        var ct = contratos[i] || {};
+        if (ct.pay && ct.pay.show && (ct.pay.copiaCola || ct.pay.qrDataUrl)){
+          var numero = ct.numero || "";
+          var valor = ct.valor || "";
+          var venc = ct.venc || "";
+          var meta2 = "Contrato " + numero +
+            (valor ? (" • R$ " + valor) : "") +
+            (venc ? (" • Venc.: " + venc) : "");
+          openPixModal("Pagamento Pix • Contrato " + numero, "Aponte a câmera ou use o Copia e Cola.", meta2, ct.pay.qrDataUrl || "", ct.pay.copiaCola || "");
+          return;
+        }
+      }
+
+      // Se não encontrou nada, só não faz nada.
+    }
+    // -------------------------------------------
+
+    // --- iOS/Android: tentar impedir “zoom preso” após teclado ---
+    var __kbd = { y: 0, active: false };
+
+    function viewportMetaEl(){
+      return document.getElementById("viewportMeta") || document.querySelector('meta[name="viewport"]');
+    }
+
+    function bumpViewportScale(){
+      // Truque comum: reescreve o meta viewport rapidamente para “destravar” o zoom
+      var m = viewportMetaEl();
+      if (!m) return;
+      var base = "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover";
+      // toggles mínimos para forçar o Safari a recalcular
+      m.setAttribute("content", base + ", minimum-scale=1");
+      setTimeout(function(){ m.setAttribute("content", base + ", minimum-scale=1, user-scalable=no"); }, 50);
+      setTimeout(function(){ m.setAttribute("content", base + ", minimum-scale=1, maximum-scale=1, user-scalable=no"); }, 120);
+    }
+
+    function dismissKeyboardAndResetZoom(){
+      // Use APENAS quando você quer fechar o teclado (ex: ao clicar em Entrar / após login)
+      try{ if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}
+
+      // Força o viewport para escala padrão imediatamente (principalmente mobile)
+      lockKeyboardZoom();
+      bumpViewportScale();
+
+      // Move um tico pra forçar reflow e reduzir “zoom preso”
+      try{ window.scrollTo(0, Math.max(0, window.scrollY - 1)); }catch(e){}
+
+      // Reaplica em ondas curtas enquanto o teclado recolhe
+      [80, 180, 320].forEach(function(delay){
+        setTimeout(function(){
+          try{ window.scrollTo(0, __kbd.y || 0); }catch(e2){}
+          lockKeyboardZoom();
+          bumpViewportScale();
+        }, delay);
+      });
+    }
+
+    function isEditableEl(el){
+      if (!el) return false;
+      var tag = (el.tagName || "").toLowerCase();
+      return tag === "input" || tag === "textarea" || el.isContentEditable === true;
+    }
+
+    function softResetZoomIfNoFieldFocused(){
+      // Se o usuário só trocou de campo (CPF -> tel4), NÃO fecha o teclado.
+      // Só tenta normalizar o zoom quando não há nenhum campo focado.
+      setTimeout(function(){
+        if (isEditableEl(document.activeElement)) return;
+        try{ window.scrollTo(0, __kbd.y || 0); }catch(e){}
+        bumpViewportScale();
+      }, 180);
+    }
+
+    function onInputFocus(){
+      __kbd.active = true;
+      __kbd.y = window.scrollY || 0;
+      document.body.classList.add("kbd");
+    }
+
+    function onInputBlur(){
+      __kbd.active = false;
+      document.body.classList.remove("kbd");
+      // Importante: não fechar teclado aqui (senão ele fecha ao trocar de CPF -> tel4)
+      softResetZoomIfNoFieldFocused();
+    }
+
+    function gasGetCliente(cpf, tel4, ok, fail){
+      if (!window.google || !google.script || !google.script.run){
+        fail(new Error("google.script.run não disponível. Abra pelo link do WebApp."));
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(ok)
+        .withFailureHandler(function(err){ fail(new Error(err && err.message ? err.message : err)); })
+        .getCliente(cpf, tel4);
+    }
+
+    function gasGetClienteByMagic(magic, ok, fail){
+      if (!window.google || !google.script || !google.script.run){
+        fail(new Error("google.script.run não disponível. Abra pelo link do WebApp."));
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(ok)
+        .withFailureHandler(function(err){ fail(new Error(err && err.message ? err.message : err)); })
+        .getClienteByMagic(magic);
+    }
+
+    var LAST_PIX = { copia:"", meta:"" };
+
+    function openPixModal(title, sub, meta, qrSrc, copia){
+      if (CONFIG.debug) console.log("openPixModal OK:", title, meta.slice(0,30));
+LAST_PIX.copia = copia || "";
+      LAST_PIX.meta = meta || "";
+
+      $("pixTitle").textContent = title || "Pagamento Pix";
+      $("pixSub").textContent = sub || "Aponte a câmera ou use o Copia e Cola.";
+      $("pixMeta").textContent = meta || "";
+      $("pixQr").src = qrSrc || "";
+      $("pixCopia").value = copia || "";
+
+      var m = $("pixModal");
+      m.style.display = "flex";
+      m.setAttribute("aria-hidden", "false");
+    }
+
+    function closePixModal(){
+      var m = $("pixModal");
+      m.style.display = "none";
+      m.setAttribute("aria-hidden", "true");
+    }
+
+    function copyText(text){
+      var t = String(text || "");
+      try{
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          return navigator.clipboard.writeText(t);
+        }
+      }catch(e){}
+      var ta = document.createElement("textarea");
+      ta.value = t;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try{ document.execCommand("copy"); }catch(e2){}
+      document.body.removeChild(ta);
+      return Promise.resolve();
+    }
+
+    function renderPendencias(resp){
+      var s = resp.summary || {};
+      var payAll = resp.payAll || { show:false };
+
+      var resumo = "Contratos ativos: " + (s.activeContracts || 0);
+      if (s.totalMonthly) resumo += " • Total mês: R$ " + s.totalMonthly;
+      if (s.nextDue) resumo += " • Próx. venc.: " + s.nextDue;
+      $("pendSub").textContent = resumo;
+
+      var top = "";
+      if (payAll.show){
+        var tone = payAll.tone || "green";
+        var pulse = payAll.pulse ? " pulse" : "";
+        var btnClass = "payBtn pay-" + tone + pulse;
+
+        var meta = "Pagar todos" + (payAll.amount ? (" • R$ " + payAll.amount) : "") + (s.nextDue ? (" • Próx. venc.: " + s.nextDue) : "");
+
+        top =
+          '<div class="payWrap">' +
+            '<button class="' + btnClass + '" ' +
+              'data-act="pixAll" ' +
+              'data-title="' + escapeHtml("Pagamento Pix • Todos os contratos") + '" ' +
+              'data-meta="' + escapeHtml(meta) + '" ' +
+              'data-qr="' + escapeHtml(payAll.qrDataUrl || "") + '" ' +
+              'data-copia="' + escapeHtml(payAll.copiaCola || "") + '">' +
+              '⚡ ' + escapeHtml(payAll.label || "Pagar todos") +
+            '</button>' +
+          '</div>';
+      }
+      $("pendTop").innerHTML = top;
+
+      var listP = $("listPendencias");
+      if (resp.pendencias && resp.pendencias.length){
+        var pHtml = "";
+        for (var j=0; j<resp.pendencias.length; j++){
+          var p = resp.pendencias[j];
+          pHtml +=
+            '<div class="item">' +
+              '<div class="ico">⚠️</div>' +
+              '<div class="txt"><b>' + escapeHtml(p.titulo || "Pendência") + '</b><span>' + escapeHtml(p.detalhe || "") + '</span></div>' +
+              '<div class="pill danger">Atenção</div>' +
+            '</div>';
+        }
+        listP.innerHTML = pHtml;
+      } else {
+        listP.innerHTML =
+          '<div class="item">' +
+            '<div class="ico">✅</div>' +
+            '<div class="txt"><b>Sem pendências</b><span>Tudo certo por aqui.</span></div>' +
+            '<div class="pill ok">OK</div>' +
+          '</div>';
+      }
+    }
+
+    function renderContratos(resp){
+      var listC = $("listContratos");
+      var contratos = (resp.contratos && resp.contratos.length) ? resp.contratos : [];
+
+      if (!contratos.length){
+        listC.innerHTML =
+          '<div class="item">' +
+            '<div class="ico">📄</div>' +
+            '<div class="txt"><b>Nenhum contrato exibido</b><span>Se você tem locação ativa, chama no WhatsApp que a gente ajusta.</span></div>' +
+            '<div class="pill">Vô</div>' +
+          '</div>';
+        return;
+      }
+
+      var html = "";
+      for (var i=0; i<contratos.length; i++){
+        var ct = contratos[i] || {};
+        var numero = ct.numero || "";
+        var maquina = ct.maquina || "Máquina";
+        var valor = ct.valor || "";
+        var venc = ct.venc || "";
+        var status = ct.status || "Ativo";
+        var obs = ct.obs || "";
+
+        var pillClass = "ok";
+        if (/atras/i.test(status)) pillClass = "danger";
+        else if (/vence/i.test(status)) pillClass = "warn";
+
+        var obsHtml = obs ? ('<span class="obs">📝 ' + escapeHtml(obs) + '</span>') : "";
+
+        var payHtml = "";
+        if (ct.pay && ct.pay.show){
+          var tone = ct.pay.tone || "green";
+          var pulse = ct.pay.pulse ? " pulse" : "";
+          var btnClass = "payBtn pay-" + tone + pulse;
+
+          var meta = "Contrato " + numero + (valor ? (" • R$ " + valor) : "") + (venc ? (" • Venc.: " + venc) : "");
+          if (obs) meta += " • Obs: " + obs;
+
+          payHtml =
+            '<div class="payWrap">' +
+              '<button class="' + btnClass + '" ' +
+                'data-act="pix" ' +
+                'data-title="' + escapeHtml("Pagamento Pix • Contrato " + numero) + '" ' +
+                'data-meta="' + escapeHtml(meta) + '" ' +
+                'data-qr="' + escapeHtml(ct.pay.qrDataUrl || "") + '" ' +
+                'data-copia="' + escapeHtml(ct.pay.copiaCola || "") + '">' +
+                '⚡ ' + escapeHtml(ct.pay.label || "Pagar via Pix") +
+              '</button>' +
+            '</div>';
+        }
+
+        html +=
+          '<div class="item">' +
+            '<div class="ico">🧾</div>' +
+            '<div class="txt">' +
+              '<b>Contrato ' + escapeHtml(numero) + ' • ' + escapeHtml(maquina) + '</b>' +
+              '<span>' +
+                (valor ? ('R$ ' + escapeHtml(valor) + ' • ') : '') +
+                (venc ? ('Venc.: ' + escapeHtml(venc) + ' • ') : '') +
+                escapeHtml(status) +
+              '</span>' +
+              obsHtml +
+            '</div>' +
+            '<div class="pill ' + pillClass + '">' + escapeHtml(status) + '</div>' +
+            payHtml +
+          '</div>';
+      }
+
+      listC.innerHTML = html;
+    }
+
+    function renderDash(resp){
+      var c = resp.cliente || {};
+      $("hello").textContent = "Olá, " + (c.nome || "Cliente") + " 👋";
+
+      var parts = [];
+      if (c.cidade) parts.push("📍 " + c.cidade);
+      if (c.whatsapp) parts.push("💬 " + c.whatsapp);
+      if (c.cadastro_em) parts.push("🗓️ Cadastro: " + c.cadastro_em);
+      $("helloSub").textContent = parts.join(" • ");
+
+      renderContratos(resp);
+      renderPendencias(resp);
+    }
+
+    function setActiveNav(btnId){
+      ["navCadastro","navCliente","navWpp"].forEach(function(id){
+        var b = $(id);
+        if (!b) return;
+        b.classList.remove("primary");
+      });
+      if ($(btnId)) $(btnId).classList.add("primary");
+    }
+
+    function applyLoggedInUI(resp){
+      show($("viewLogin"), false);
+      show($("viewDash"), true);
+      setLoginMode(false);
+      showBottomBar(true);
+      $("btnSair").style.display = "inline-flex";
+      renderDash(resp);
+      setActiveNav("navCliente");
+      dismissKeyboardAndResetZoom();
+      lockKeyboardZoom();
+
+      // ✅ Depois de renderizar, tenta auto-abrir Pix se a URL pediu (robusto)
+      (function autoOpenPixWithRetries(){
+        try{
+          // lê direto da URL (não confia só no AUTO_OPEN.mode)
+          var open = "";
+          try{
+            open = (new URL(window.location.href)).searchParams.get("open") || "";
+            open = String(open).toLowerCase();
+          }catch(e){}
+
+          if (open !== "pix") return;         // só roda se ?open=pix
+          if (AUTO_OPEN && AUTO_OPEN.tried) return;
+
+          var tries = 0;
+          var maxTries = 14;                  // ~2.1s (14 * 150ms)
+
+          function openByButton(btn){
+            if (!btn) return false;
+
+            // aciona o fluxo real da interface (equivalente ao usuário tocar no botão)
+            btn.click();
+
+            // fallback de segurança se algum bloqueio impedir o click delegado
+            var modal = $("pixModal");
+            if (modal && modal.getAttribute("aria-hidden") === "true"){
+              var title = btn.getAttribute("data-title") || "Pagamento Pix";
+              var meta  = btn.getAttribute("data-meta")  || "";
+              var qr    = btn.getAttribute("data-qr")    || "";
+              var copia = btn.getAttribute("data-copia") || "";
+              openPixModal(title, "Aponte a câmera ou use o Copia e Cola.", meta, qr, copia);
+            }
+            return true;
+          }
+
+          function tick(){
+            tries++;
+
+            // prioridade: pagar todos
+            var btnAll = document.querySelector('[data-act="pixAll"]');
+            if (openByButton(btnAll)){
+              markAutoOpenTried();
+              return;
+            }
+
+            // fallback: primeiro pix de contrato
+            var btnOne = document.querySelector('[data-act="pix"]');
+            if (openByButton(btnOne)){
+              markAutoOpenTried();
+              return;
+            }
+
+            if (tries < maxTries){
+              setTimeout(tick, 150);
+            } else {
+              // não achou nada -> não marca tried (pra você poder tentar de novo recarregando)
+              if (CONFIG.debug) console.log("AUTO_OPEN: não encontrou botões Pix.");
+            }
+          }
+
+          // dá um tempo pro DOM pintar
+          setTimeout(tick, 220);
+
+        }catch(err){
+          if (CONFIG.debug) console.error("AUTO_OPEN erro:", err);
+        }
+      })();
+    }
+
+    function entrar(){
+      setError("");
+      setCadastroHint(false);
+
+      var cpf = onlyDigits($("cpf").value);
+      var tel4 = onlyDigits($("tel4").value);
+
+      if (cpf.length !== 11){ setError("CPF inválido. Digite 11 números."); return; }
+      if (tel4.length !== 4){ setError("Digite os 4 últimos dígitos do WhatsApp."); return; }
+
+      // Aqui SIM: o usuário clicou em Entrar, então fecha o teclado e normaliza o zoom
+      dismissKeyboardAndResetZoom();
+      lockKeyboardZoom();
+
+      setLoading(true);
+
+      // Se quiser testar layout sem GAS, ligue CONFIG.enableFakeLogin
+      if (CONFIG.enableFakeLogin && cpf === CONFIG.fakeCpf && tel4 === CONFIG.fakeTel4){
+        setTimeout(function(){
+          setLoading(false);
+          applyLoggedInUI(fakeResponse());
+        }, 250);
+        return;
+      }
+
+      gasGetCliente(cpf, tel4,
+        function(resp){
+          setLoading(false);
+          if (!resp || !resp.ok){
+            var msg = resp && resp.msg ? resp.msg : "Falha ao validar. Tente novamente.";
+            setError(msg);
+            setCadastroHint(isCpfNaoLocalizado(msg));
+            return;
+          }
+          applyLoggedInUI(resp);
+        },
+        function(err){
+          setLoading(false);
+          var msg = err && err.message ? err.message : String(err);
+          setError(msg);
+          setCadastroHint(isCpfNaoLocalizado(msg));
+        }
+      );
+    }
+
+    function fakeResponse(){
+      return {
+        ok: true,
+        cliente: { nome: "Cliente Teste", cidade: "Goiânia", whatsapp: "(62) 99999-0000", cadastro_em: "01/01/2026" },
+        summary: { activeContracts: 2, totalMonthly: "750,00", nextDue: "23/02/2026" },
+        payAll: { show: true, tone: "yellow", pulse: false, label: "Pagar todos (vence em 6d)", amount: "750,00", qrDataUrl: "", copiaCola: "000201010212..." },
+        contratos: [
+          { numero: "964", maquina: "PONTO CADEIA", valor: "400,00", venc: "23/02/2026", status: "Encerrado", obs: "CONTRATO", pay: { show: true, tone: "green", pulse: false, label: "Pagar via Pix", qrDataUrl: "", copiaCola: "pix964" } },
+          { numero: "966", maquina: "PONTO CADEIA", valor: "350,00", venc: "23/02/2026", status: "Encerrado", obs: "CONTRATO", pay: { show: true, tone: "green", pulse: false, label: "Pagar via Pix", qrDataUrl: "", copiaCola: "pix966" } }
+        ],
+        pendencias: []
+      };
+    }
+
+    function sair(){
+      $("cpf").value = "";
+      $("tel4").value = "";
+      setError("");
+      setCadastroHint(false);
+      show($("viewDash"), false);
+      show($("viewLogin"), true);
+      setLoginMode(true);
+      showBottomBar(false);
+      $("btnSair").style.display = "none";
+      setActiveNav("navCliente");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function onClickDelegado(ev){
+      var el = ev.target;
+      while (el && el !== document.body){
+        var act = el.getAttribute && el.getAttribute("data-act");
+        if (act === "pix" || act === "pixAll"){
+          var title = el.getAttribute("data-title") || "Pagamento Pix";
+          var meta  = el.getAttribute("data-meta") || "";
+          var qr    = el.getAttribute("data-qr") || "";
+          var copia = el.getAttribute("data-copia") || "";
+          openPixModal(title, "Aponte a câmera ou use o Copia e Cola.", meta, qr, copia);
+          return;
+        }
+        el = el.parentNode;
+      }
+    }
+
+    function attemptMagicLoginFromUrl(){
+      var magic = String(getQueryParam("magic") || "").trim();
+      if (!magic) return;
+
+      setError("");
+      setCadastroHint(false);
+      setLoading(true);
+
+      gasGetClienteByMagic(magic,
+        function(resp){
+          setLoading(false);
+          if (!resp || !resp.ok){
+            setError((resp && resp.msg) ? resp.msg : "Link mágico inválido ou expirado.");
+            return;
+          }
+          applyLoggedInUI(resp);
+        },
+        function(err){
+          setLoading(false);
+          var msg = err && err.message ? err.message : String(err);
+          setError(msg || "Não foi possível validar o link mágico.");
+        }
+      );
+    }
+
+    function runSelfTests(){
+      function assert(name, cond){
+        if (!cond) throw new Error("Teste falhou: " + name);
+        if (CONFIG.debug) console.log("✅", name);
+      }
+      assert("onlyDigits", onlyDigits("044.509.311-07") === "04450931107");
+      assert("escapeHtml", escapeHtml('<b>&"\'') === "&lt;b&gt;&amp;&quot;&#039;");
+      assert("wppLink has phone", wppLink("oi").indexOf("phone=" + CONFIG.whatsappPhone) !== -1);
+      assert("viewportMeta exists", !!viewportMetaEl());
+      assert("getQueryParam exists", typeof getQueryParam === "function");
+      assert("maybeAutoOpenPix exists", typeof maybeAutoOpenPix === "function");
+    }
+
+    window.addEventListener("DOMContentLoaded", function(){
+      function setVh(){
+        var h = (window.visualViewport && visualViewport.height) ? visualViewport.height : window.innerHeight;
+        document.documentElement.style.setProperty("--vh", (h * 0.01) + "px");
+      }
+      setVh();
+      if (window.visualViewport){
+        visualViewport.addEventListener("resize", setVh);
+        visualViewport.addEventListener("scroll", setVh);
+      }
+      window.addEventListener("resize", setVh);
+
+      // Modal Pix fechado por padrão
+      try{ closePixModal(); }catch(e){}
+
+      // Fallback da logo
+      var logo = $("logoImg");
+      if (logo){
+        logo.addEventListener("error", function(){
+          var box = $("logoBox");
+          if (box){ box.classList.add("fallback"); }
+          try{ logo.remove(); }catch(e){}
+        });
+      }
+
+      // Links topo
+      $("btnCadastro").href = CONFIG.cadastroWebAppUrl;
+      $("btnWppTopo").href = wppLink("Olá! Vim pela Área do Cliente da Vô Máquinas. Preciso de ajuda.");
+      $("cadastroHintLink").href = CONFIG.cadastroWebAppUrl;
+
+      // Login inicia sem barra inferior
+      setLoginMode(true);
+      showBottomBar(false);
+
+      // CTA login / wpp
+      $("btnEntrar").addEventListener("click", entrar);
+      $("btnWhats").addEventListener("click", function(){
+        window.open(wppLink("Olá! Preciso de ajuda para acessar minha Área do Cliente."), "_blank", "noopener");
+      });
+
+      // Sair
+      $("btnSair").addEventListener("click", sair);
+
+      // Inputs: foco/blur pra tentar reduzir zoom preso + enter + só dígitos
+      ["cpf","tel4"].forEach(function(id){
+        var el = $(id);
+        if (!el) return;
+        el.addEventListener("focus", onInputFocus);
+        el.addEventListener("blur", onInputBlur);
+        el.addEventListener("keydown", function(e){
+          if (e.key === "Enter"){ e.preventDefault(); entrar(); }
+        });
+        el.addEventListener("input", function(){
+          var v = onlyDigits(el.value);
+          if (id === "tel4") v = v.slice(0,4);
+          if (id === "cpf") v = v.slice(0,11);
+          el.value = v;
+        });
+      });
+
+      // Barra inferior
+      $("navCadastro").addEventListener("click", function(){
+        window.open(CONFIG.cadastroWebAppUrl, "_blank", "noopener");
+        setActiveNav("navCadastro");
+      });
+      $("navWpp").addEventListener("click", function(){
+        window.open(wppLink("Olá! Vim pela Área do Cliente da Vô Máquinas."), "_blank", "noopener");
+        setActiveNav("navWpp");
+      });
+      $("navCliente").addEventListener("click", function(){
+        setActiveNav("navCliente");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Ações do dashboard
+      $("btn2via").addEventListener("click", function(){
+        window.open(wppLink("Olá! Quero 2ª via / comprovantes do meu contrato."), "_blank", "noopener");
+      });
+      $("btnSuporte").addEventListener("click", function(){
+        window.open(wppLink("Olá! Quero abrir suporte técnico da minha máquina."), "_blank", "noopener");
+      });
+      $("btnRenovar").addEventListener("click", function(){
+        window.open(wppLink("Olá! Quero renovar / negociar meu contrato."), "_blank", "noopener");
+      });
+      $("btnLocal").addEventListener("click", function(){
+        window.open(wppLink("Olá! Vou enviar minha localização agora."), "_blank", "noopener");
+      });
+
+      // Modal Pix
+      $("pixClose").addEventListener("click", closePixModal);
+      $("pixModal").addEventListener("click", function(e){
+        if (e.target === $("pixModal")) closePixModal();
+      });
+      $("pixCopyBtn").addEventListener("click", function(){
+        copyText($("pixCopia").value).then(function(){
+          var b = $("pixCopyBtn");
+          if (!b) return;
+          var old = b.textContent;
+          b.textContent = "✅ Copiado!";
+          setTimeout(function(){ b.textContent = old; }, 1200);
+        });
+      });
+      $("pixWppBtn").addEventListener("click", function(){
+        var nl = String.fromCharCode(10);
+        var msg = "Pix para pagamento:" + nl + nl + ($("pixMeta").textContent || "") + nl + nl + ($("pixCopia").value || "");
+        window.open(wppLink(msg), "_blank", "noopener");
+      });
+
+      // Clique delegado (Pix nos itens)
+      document.addEventListener("click", onClickDelegado);
+
+      // Link mágico: entra já logado (se houver ?magic=...)
+      attemptMagicLoginFromUrl();
+
+      // Testes (opcional)
+      try{ runSelfTests(); }catch(e){ if (CONFIG.debug) console.error(e); }
+    });
+  </script>
+</body>
+</html>
